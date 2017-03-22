@@ -1,3 +1,11 @@
+# RPi-Band
+
+RPi-Band fuses the Pimoroni Piano HAT and Drum HAT code to a single software,
+which gives the possibility for playing two intruments on a single Raspberry Pi.
+
+
+# ORIGINAL README Piano HAT
+
 ![Piano HAT](piano-hat-logo-new.png)
 
 * 16 Capacitive Touch Buttons
@@ -98,3 +106,5 @@ You'll find the MIDI Piano example in the examples folder of this repository, or
 * Yoshimi ( `sudo apt-get install yoshimi` )
 
 Run either of these synths first, and then run `sudo ./midi-piano.py` and start playing. For best results, you should use a Pi 2- especially with Yoshimi which can be a bit taxing on the older models.
+
+# ORIGINAL README Drum HAT
