@@ -3,6 +3,43 @@
 RPi-Band fuses the Pimoroni Piano HAT and Drum HAT code to a single software,
 which gives the possibility for playing two intruments on a single Raspberry Pi.
 
+The original READMEs are included below for completeness and are not necessary for running RPi-Band.
+
+# Installing RPi-Band
+
+sudo apt-get update && sudo apt-get -y dist-upgrade
+
+curl -sS get.pimoroni.com/pianohat | bash
+
+More like this:
+
+You can install Drum HAT manually like so:
+
+sudo apt-get install python-smbus
+git clone https://github.com/JoBergs/RPi-Band
+cd RPi-Band/library
+sudo python setup.py install
+
+MANUALLY ACTIVATE I2C in raspi-config?
+
+So, this works, but the speed is very bad. TRY:
+    -> install the drums from fresh
+    -> original installation: speed ok?
+    -> with only the piano
+    -> use with official wallwart
+
+Or, for Python 3:
+
+sudo apt-get install python3-smbus
+git clone https://github.com/pimoroni/drum-hat
+cd drum-hat/library
+sudo python3 setup.py install
+
+INSTALL DRUM HAT, add piano files
+
+Button checking needs to be done in rpi-band since it's optional
+
+
 
 # ORIGINAL README Piano HAT
 

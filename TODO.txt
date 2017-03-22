@@ -1,0 +1,7 @@
+* -b flag for rpi-band with hardware pushbutton
+
+* py3? py2?
+
+* integrate drum HAT
+
+* merge code
