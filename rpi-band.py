@@ -85,7 +85,7 @@ def load_samples(patch):
     files_piano = []
     print('Loading samples_piano from: {}'.format(patch))
 
-    files_piano.extend(glob.glob(os.path.join(patch, filetype)))
+    files_piano.extend(glob.glob(os.path.join(patch, "*.wav")))
     files_piano.sort(key=natural_sort_key)
     octaves = len(files_piano) / 12
     samples_piano = [pygame.mixer.Sound(sample) for sample in files_piano]
