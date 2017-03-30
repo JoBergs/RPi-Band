@@ -17,15 +17,6 @@ GPIO.setmode(GPIO.BCM)
 # button for turning on and off the rpi-band sits on pin 14 (GND) and pin 18(IO: 24 in BCM) in BOARD numbering
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-'''
-while True:
-    input_state = GPIO.input(18)
-    if input_state == False:
-        print('Button Pressed')
-        time.sleep(0.2)
-
-
-'''
 
 PIANO_BANK = os.path.join(os.path.dirname(__file__), "sounds")
 DRUM_BANK = os.path.join(os.path.dirname(__file__), "drums2")
@@ -151,21 +142,14 @@ def turn_off(pin):
     """ Shutdown the Raspberry Pi; the argument pin is not required
     but passed by event_detect. """
 
-    print("Shutting down...")
-
     GPIO.cleanup()
     subprocess.call(['echo posys | sudo -S poweroff'], shell=True)
 
 
 
 if __name__ == "__main__":
-
-    while True:
-        input_state = GPIO.input(24)
-        if input_state == False:            
-            print('Here comes the drum!')
-            time.sleep(0.2)
-            GPIO.add_event_detect(24, edge=GPIO.FALLING, callback=turn_off)  
-            start_band()
+    # optional shutdown button
+    GPIO.add_event_detect(24, edge=GPIO.FALLING, callback=turn_off)  
+    start_band()
 
 
