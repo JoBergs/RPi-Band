@@ -64,12 +64,8 @@ def handle_hit(event):
 def handle_release():
     pass
 
-drumhat.on_hit(drumhat.PADS, handle_hit)
-drumhat.on_release(drumhat.PADS, handle_release)
-
 ######## /DRUMS
 
-FILETYPES = ['*.wav', '*.ogg']
 samples_piano = []
 files_piano = []
 octave = 0
@@ -88,8 +84,8 @@ def load_samples(patch):
 
     files_piano = []
     print('Loading samples_piano from: {}'.format(patch))
-    for filetype in FILETYPES:
-        files_piano.extend(glob.glob(os.path.join(patch, filetype)))
+
+    files_piano.extend(glob.glob(os.path.join(patch, filetype)))
     files_piano.sort(key=natural_sort_key)
     octaves = len(files_piano) / 12
     samples_piano = [pygame.mixer.Sound(sample) for sample in files_piano]
@@ -135,6 +131,9 @@ def start_band():
     pianohat.on_instrument(handle_instrument)
 
     load_samples(patches[patch_index])
+
+    drumhat.on_hit(drumhat.PADS, handle_hit)
+    drumhat.on_release(drumhat.PADS, handle_release)
 
     signal.pause()
 
