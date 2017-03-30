@@ -18,8 +18,8 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 
-PIANO_BANK = os.path.join(os.path.dirname(__file__), "sounds")
-DRUM_BANK = os.path.join(os.path.dirname(__file__), "drums2")
+PIANO_BANK = os.path.join(os.path.dirname(__file__), "sounds/piano")
+DRUM_BANK = os.path.join(os.path.dirname(__file__), "sounds/drums2")
 
 
 print("""
