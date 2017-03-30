@@ -18,7 +18,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 
-PIANO_BANK = os.path.join(os.path.dirname(__file__), "sounds/piano")
+PIANO_BANK = os.path.join(os.path.dirname(__file__), "sounds/")
 DRUM_BANK = os.path.join(os.path.dirname(__file__), "sounds/drums2")
 
 
@@ -29,7 +29,7 @@ The Piano HAT needs directories of wav files_piano in:
 
 {}
 
-The Drum HAT needs directories of wav files_piano in:
+The Drum HAT needs directories of wav files_drum in:
 
 {}
 
@@ -61,7 +61,6 @@ def handle_hit(event):
     samples_drum[event.channel].play(loops=0)
     print("You hit pad {}, playing: {}".format(event.pad,files_drum[event.channel]))
 
-
 def handle_release():
     pass
 
@@ -77,7 +76,7 @@ octave = 0
 octaves = 0
 
 patches = glob.glob(os.path.join(PIANO_BANK, '*'))
-patch_index = 0
+patch_index = 1  # this is bad for selecting the piano; rethink sound management
 
 
 def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
@@ -86,6 +85,7 @@ def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
 
 def load_samples(patch):
     global samples_piano, files_piano, octaves, octave
+
     files_piano = []
     print('Loading samples_piano from: {}'.format(patch))
     for filetype in FILETYPES:
@@ -143,7 +143,7 @@ def turn_off(pin):
     but passed by event_detect. """
 
     GPIO.cleanup()
-    subprocess.call(['echo posys | sudo -S poweroff'], shell=True)
+    subprocess.call(['sudo poweroff'], shell=True)
 
 
 
