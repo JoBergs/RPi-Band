@@ -114,16 +114,10 @@ class Piano(Instrument):
             self.load_sounds()
 
     def handle_octave_up(self, channel, pressed):
-        print("up octaves/octave")
-        print(self.octaves)
-        print(self.octave)
-        if pressed and self.octave < int(self.octaves):
+        if pressed and self.octave < int(self.octaves) - 1:
             self.octave += 1
 
     def handle_octave_down(self, channel, pressed):
-        print("down octaves/octave")
-        print(self.octaves)
-        print(self.octave)
         if pressed and self.octave > 0:
             self.octave -= 1
 
