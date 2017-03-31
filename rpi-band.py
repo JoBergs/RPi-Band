@@ -59,12 +59,21 @@ class Drums:
     sounds = []
 
     def __init__(self, sound_index):
-        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, sound_sets[sound_index], "*.wav"))
-        sounds_path.sort(key=natural_sort_key)
-        self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
+        self.sound_index = sound_index
+        self.load_sounds()
+
+        # sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, sound_sets[sound_index], "*.wav"))
+        # sounds_path.sort(key=natural_sort_key)
+        # self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
 
         drumhat.on_hit(drumhat.PADS, self.handle_hit)
         drumhat.on_release(drumhat.PADS, self.handle_release)
+
+    def load_sounds(self):
+        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
+                                                   sound_sets[self.sound_index], "*.wav"))
+        sounds_path.sort(key=natural_sort_key)
+        self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]  
 
     def handle_hit(self, event):
         # event.channel is a zero based channel index for each pad
@@ -83,6 +92,7 @@ class Piano:
     def __init__(self, sound_index):
         self.sound_index = sound_index
         self.load_sounds()
+
         self.octaves = len(self.sounds) / 12
         self.octave = int(self.octaves / 2)
 
