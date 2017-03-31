@@ -95,16 +95,16 @@ class Drums(Instrument):
         pass  
 
 # maybe add a wrapper four outputting played sound  filename?
-class Piano:
-    sounds = []
+class Piano(Instrument):
+    # sounds = []
     octave = 0
     octaves = 0  
-    sound_index = 0
+    # sound_index = 0
 
     def __init__(self, sound_index):
-        # super(Piano, self).__init__(sound_index)
-        self.sound_index = sound_index
-        self.load_sounds()
+        super(Piano, self).__init__(sound_index)
+        # self.sound_index = sound_index
+        # self.load_sounds()
 
         # it's prettier to overload load_sounds!
         self.set_octave()
@@ -121,18 +121,18 @@ class Piano:
         self.octaves = len(self.sounds) / 12
         self.octave = int(self.octaves / 2)       
 
-    def load_sounds(self):
-        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
-                                                   sound_sets[self.sound_index], "*.wav"))
-        #print(sounds_path)
-        sounds_path.sort(key=natural_sort_key)
-        self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]   
-        # i'm forgetting to reset the octave
-        # self.sounds[0].play(loops=0)
-        # self.sounds[0].play(loops=0)
-        # self.sounds[0].play(loops=0)
-        # self.sounds[0].play(loops=0)
-        #print("sounds: ", self.sounds)     
+    # def load_sounds(self):
+    #     sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
+    #                                                sound_sets[self.sound_index], "*.wav"))
+    #     #print(sounds_path)
+    #     sounds_path.sort(key=natural_sort_key)
+    #     self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]   
+    #     # i'm forgetting to reset the octave
+    #     # self.sounds[0].play(loops=0)
+    #     # self.sounds[0].play(loops=0)
+    #     # self.sounds[0].play(loops=0)
+    #     # self.sounds[0].play(loops=0)
+    #     #print("sounds: ", self.sounds)     
 
     def handle_note(self, channel, pressed):
         channel = channel + (12 * self.octave)
