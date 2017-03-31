@@ -14,6 +14,13 @@ import pianohat
 import RPi.GPIO as GPIO
 import time
 
+DESCRIPTION = '''This script integrates Pimoronis Piano HAT and Drum HAT software and gives you simple, 
+ready-to-play instruments which use .wav files located in sounds.
+The parameter -p expects the name of the directory containing the sounds that should be loaded onto the piano 
+and -d expects the name of the directory containing the sounds that should be loaded onto the drums .
+
+Press CTRL+C to exit.'''
+
 GPIO.setmode(GPIO.BCM)
 
 # safe shutdown button is pin 14 (GND) and pin 18(IO: 24 in BCM) in BOARD numbering
@@ -26,17 +33,10 @@ DRUM_BANK = os.path.join(os.path.dirname(__file__), "sounds/drums2")
 def parse_arguments(sysargs):
     """ Setup the command line options. """
 
-    description = '''This script integrates Pimoronis Piano HAT and Drum HAT software and gives you simple, 
-ready-to-play instruments which use .wav files located in sounds.
-The parameter -p expects the name of the directory containing the sounds that should be loaded onto the piano 
-and -d expects the name of the directory containing the sounds that should be loaded onto the drums .
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
 
-Press CTRL+C to exit.'''
-
-    parser = argparse.ArgumentParser(description=description)
-
-    parser.add_argument('-p', '--piano', dest='piano', default='piano')
-    parser.add_argument('-d', '--drums', dest='drums', default='drums2')
+    parser.add_argument('-p', '--piano', dest='DIRNAME', default='piano')
+    parser.add_argument('-d', '--drums', dest='DIRNAME', default='drums2')
 
 
     return parser.parse_args(sysargs)
@@ -150,6 +150,7 @@ if __name__ == "__main__":
     # optional shutdown button
     GPIO.add_event_detect(24, edge=GPIO.FALLING, callback=turn_off) 
     args = parse_arguments(sys.argv[1:]) 
+    print(args)
     start_band(args)
 
 
