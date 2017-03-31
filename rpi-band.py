@@ -80,10 +80,12 @@ class Piano:
     octaves = 0  
     sound_index = 0
 
-    def __init__(self, start_index):
-        self.sound_index = start_index
-        #self.sound_set = start_index
+    def __init__(self, sound_index):
+        self.sound_index = sound_index
         self.load_sounds()
+        self.octaves = len(self.sounds) / 12
+        self.octave = int(self.octaves / 2)
+
         pianohat.on_note(self.handle_note)
         pianohat.on_octave_up(self.handle_octave_up)
         pianohat.on_octave_down(self.handle_octave_down)
@@ -95,12 +97,7 @@ class Piano:
         sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
                                                    sound_sets[self.sound_index], "*.wav"))
         sounds_path.sort(key=natural_sort_key)
-        self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
-
-        self.octaves = len(sounds_path) / 12
-        self.octave = int(self.octaves / 2)
-
-        
+        self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]        
 
     def handle_note(self, channel, pressed):
         channel = channel + (12 * self.octave)
