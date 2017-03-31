@@ -6,6 +6,8 @@ import signal
 import glob
 import os
 import re
+import argparse
+import sys
 
 import drumhat
 import pianohat
@@ -14,33 +16,31 @@ import time
 
 GPIO.setmode(GPIO.BCM)
 
-# button for turning on and off the rpi-band sits on pin 14 (GND) and pin 18(IO: 24 in BCM) in BOARD numbering
+# safe shutdown button is pin 14 (GND) and pin 18(IO: 24 in BCM) in BOARD numbering
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 
 PIANO_BANK = os.path.join(os.path.dirname(__file__), "sounds/")
 DRUM_BANK = os.path.join(os.path.dirname(__file__), "sounds/drums2")
 
+def parse_arguments(sysargs):
+    """ Setup the command line options. """
 
-print("""
-This script integrates Pimoronis Piano HAT and Drum HAT software and gives you simple, ready-to-play instruments which use .wav files_piano.
+    description = '''This script integrates Pimoronis Piano HAT and Drum HAT software and gives you simple, 
+ready-to-play instruments which use .wav files located in sounds.
+The parameter -p expects the name of the directory containing the sounds that should be loaded onto the piano 
+and -d expects the name of the directory containing the sounds that should be loaded onto the drums .
 
-The Piano HAT needs directories of wav files_piano in:
+Press CTRL+C to exit.'''
 
-{}
+    parser = argparse.ArgumentParser(description=description)
 
-The Drum HAT needs directories of wav files_drum in:
+    parser.add_argument('-p', '--piano', dest='piano', default='piano')
+    parser.add_argument('-d', '--drums', dest='drums', default='drums2')
 
-{}
 
-Drum Pads are mapped like so:
+    return parser.parse_args(sysargs)
 
-7 = Rim hit, 1 = Whistle, 2 = Clash
-6 = Hat,     8 = Clap,   3 = Cowbell
-      5 = Snare,   4 = Base
-
-Press CTRL+C to exit.
-""".format(PIANO_BANK, DRUM_BANK))
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
@@ -124,7 +124,7 @@ def handle_octave_down(channel, pressed):
         octave -= 1
         print('Selected Octave: {}'.format(octave))
 
-def start_band():
+def start_band(args):
     pianohat.on_note(handle_note)
     pianohat.on_octave_up(handle_octave_up)
     pianohat.on_octave_down(handle_octave_down)
@@ -148,7 +148,8 @@ def turn_off(pin):
 
 if __name__ == "__main__":
     # optional shutdown button
-    GPIO.add_event_detect(24, edge=GPIO.FALLING, callback=turn_off)  
-    start_band()
+    GPIO.add_event_detect(24, edge=GPIO.FALLING, callback=turn_off) 
+    args = parse_arguments(sys.argv[1:]) 
+    start_band(args)
 
 
