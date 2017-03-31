@@ -89,9 +89,6 @@ class Piano(Instrument):
     def __init__(self, sound_index):
         super(Piano, self).__init__(sound_index)
 
-        # it's prettier to overload load_sounds!
-        self.set_octave()
-
         pianohat.on_note(self.handle_note)
         pianohat.on_octave_up(self.handle_octave_up)
         pianohat.on_octave_down(self.handle_octave_down)
@@ -99,10 +96,10 @@ class Piano(Instrument):
 
         pianohat.auto_leds(True)
 
-    def set_octave(self):
+    def load_sounds(self):
+        super(Piano, self).load_sounds()
         self.octaves = len(self.sounds) / 12
-        self.octave = int(self.octaves / 2)       
-  
+        self.octave = int(self.octaves / 2)   
 
     def handle_note(self, channel, pressed):
         channel = channel + (12 * self.octave)
@@ -117,7 +114,6 @@ class Piano(Instrument):
             self.sound_index %= len(sound_sets)
 
             self.load_sounds()
-            self.set_octave()
 
     def handle_octave_up(self, channel, pressed):
         if pressed and self.octave < self.octaves:
