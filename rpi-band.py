@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 
-import subprocess
-import pygame
-import signal
+import argparse
 import glob
 import os
+import pygame
 import re
-import argparse
+import signal
+import subprocess
 import sys
 
 import drumhat
 import pianohat
 import RPi.GPIO as GPIO
-import time
 
 DESCRIPTION = '''This script integrates Pimoronis Piano HAT and Drum HAT software and gives you simple, 
 ready-to-play instruments which use .wav files located in sounds.
@@ -82,6 +81,8 @@ class Drums:
         pass  
 
 # sound_set_index should be used by drums, too
+# instrument index could be handled with getter and setter...
+# MINOR BUG: index != chosen instrument because of bad sound_set index handling
 class Piano:
     sounds = []
     octave = 0
@@ -89,14 +90,9 @@ class Piano:
     sound_set_index = 0
 
     def __init__(self, instrument_dir):
-        # original piano uses extend which might be necessary because of mutability
-        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, instrument_dir, "*.wav"))
-        sounds_path.sort(key=natural_sort_key)
-        self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
+        
 
-        self.octaves = len(sounds_path) / 12
-        self.octave = int(self.octaves / 2)
-
+        self.load_sounds(instrument_dir)
         # import ipdb
         # ipdb.set_trace()
 
@@ -104,6 +100,15 @@ class Piano:
         pianohat.on_octave_up(self.handle_octave_up)
         pianohat.on_octave_down(self.handle_octave_down)
         pianohat.on_instrument(self.handle_instrument)
+
+    def load_sounds(self, instrument_dir):
+        # original piano uses extend which might be necessary because of mutability
+        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, instrument_dir, "*.wav"))
+        sounds_path.sort(key=natural_sort_key)
+        self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
+
+        self.octaves = len(sounds_path) / 12
+        self.octave = int(self.octaves / 2)
 
         # pianohat.auto_leds(True)
 
@@ -121,10 +126,10 @@ class Piano:
         if pressed:
             self.sound_set_index += 1
             # this needs the list of possible instruments in the class
-            self.sound_set_index %= len(patches)
+            self.sound_set_index %= len(sound_sets)
             # print('Selecting Patch: {}'.format(patches[patch_index]))
             # load_samples need to be split off __init__
-            load_samples(patches[self.sound_set_index])
+            self.load_sounds(sound_sets[self.sound_set_index])
 
 
     def handle_octave_up(self, channel, pressed):
