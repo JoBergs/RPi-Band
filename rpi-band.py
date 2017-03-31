@@ -41,8 +41,8 @@ def parse_arguments(sysargs):
 
     parser = argparse.ArgumentParser(description=DESCRIPTION)
 
-    parser.add_argument('-p', '--piano', dest='DIRNAME', default='piano')
-    parser.add_argument('-d', '--drums', dest='DIRNAME', default='drums2')
+    parser.add_argument('-p', '--piano', default='piano')
+    parser.add_argument('-d', '--drums', default='drums2')
 
 
     return parser.parse_args(sysargs)
@@ -78,9 +78,11 @@ class Drums:
     sounds = []
 
     def __init__(self, args):
-        sounds_path = os.path.join(SOUND_BASEDIR, args.drums, "*.wav")
+        # import ipdb
+        # ipdb.set_trace()
+        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, args.drums, "*.wav"))
         #self.load_sounds(args.sounds_path)
-        self.sounds = [pygame.mixer.Sound(f) for f in files_drum]
+        self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
         drumhat.on_hit(drumhat.PADS, self.handle_hit)
         drumhat.on_release(drumhat.PADS, self.handle_release)
 
