@@ -55,12 +55,19 @@ pygame.mixer.set_num_channels(32)
 SOUND_BASEDIR = os.path.join(os.path.dirname(__file__), "sounds/")
 sound_sets = glob.glob(os.path.join(SOUND_BASEDIR, "*"))
 
+def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
+    return [int(text) if text.isdigit() else text.lower() for text in re.split(_nsre, s)]
+
 class Drums:
     sounds = []
 
-    def __init__(self, args):
-        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, args.drums, "*.wav"))
+    # this could be reused if args.drums is handled differently
+    # Yes: pass instrument, not args
+    def __init__(self, instrument_dir):
+        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, instrument_dir, "*.wav"))
+        sounds_path.sort(key=natural_sort_key)
         self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
+
         drumhat.on_hit(drumhat.PADS, self.handle_hit)
         drumhat.on_release(drumhat.PADS, self.handle_release)
 
@@ -73,6 +80,59 @@ class Drums:
         pass   
 
 
+class Piano:
+    sounds = []
+    octave = 0
+    octaves = 0   
+
+    def __init__(self, instrument_dir):
+        # original piano uses extend which might be necessary because of mutability
+        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, instrument_dir, "*.wav"))
+        sounds_path.sort(key=natural_sort_key)
+        self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
+
+        self.octaves = len(sounds_path) / 12
+        self.octave = int(self.octaves / 2)
+
+        pianohat.on_note(self.handle_note)
+        pianohat.on_octave_up(self.handle_octave_up)
+        pianohat.on_octave_down(self.handle_octave_down)
+        pianohat.on_instrument(self.handle_instrument)
+
+        # pianohat.auto_leds(True)
+
+        def handle_note(self, channel, pressed):
+            channel = channel + (12 * self.octave)
+            # IS len(samples_piano) == len(sounds)???
+            if channel < len(samples_piano) and pressed:
+                # print('Playing Sound: {}'.format(files_piano[channel]))
+                self.sounds[channel].play(loops=0)
+
+
+        def handle_instrument(self, channel, pressed):
+            # global patch_index
+            if pressed:
+                patch_index += 1
+                # this needs the list of possible instruments in the class
+                patch_index %= len(patches)
+                # print('Selecting Patch: {}'.format(patches[patch_index]))
+                load_samples(patches[patch_index])
+
+
+        def handle_octave_up(self, channel, pressed):
+            # global octave
+            if pressed and self.octave < self.octaves:
+                self.octave += 1
+                #print('Selected Octave: {}'.format(octave))
+
+
+        def handle_octave_down(self, channel, pressed):
+            # global octave
+            if pressed and self.octave > 0:
+                self.octave -= 1
+                #print('Selected Octave: {}'.format(octave))
+
+
 samples_piano = []
 files_piano = []
 octave = 0
@@ -82,9 +142,6 @@ patches = glob.glob(os.path.join(PIANO_BANK, '*'))
 patch_index = 1  # this is bad for selecting the piano; rethink sound management
 
 
-def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
-    return [int(text) if text.isdigit() else text.lower() for text in re.split(_nsre, s)]
-
 
 def load_samples(patch):
     global samples_piano, files_piano, octaves, octave
@@ -93,10 +150,13 @@ def load_samples(patch):
     print('Loading samples_piano from: {}'.format(patch))
 
     files_piano.extend(glob.glob(os.path.join(patch, "*.wav")))
-    files_piano.sort(key=natural_sort_key)
-    octaves = len(files_piano) / 12
+    files_piano.sort(key=natural_sort_key)    
     samples_piano = [pygame.mixer.Sound(sample) for sample in files_piano]
+
+    octaves = len(files_piano) / 12
     octave = int(octaves / 2)
+
+
 
 
 pianohat.auto_leds(True)
@@ -132,14 +192,15 @@ def handle_octave_down(channel, pressed):
         print('Selected Octave: {}'.format(octave))
 
 def start_band(args):
-    pianohat.on_note(handle_note)
-    pianohat.on_octave_up(handle_octave_up)
-    pianohat.on_octave_down(handle_octave_down)
-    pianohat.on_instrument(handle_instrument)
+    # pianohat.on_note(handle_note)
+    # pianohat.on_octave_up(handle_octave_up)
+    # pianohat.on_octave_down(handle_octave_down)
+    # pianohat.on_instrument(handle_instrument)
 
-    load_samples(patches[patch_index])
+    # load_samples(patches[patch_index])
 
-    drums = Drums(args)
+    drums = Drums(args.drums)
+    piano = Piano(args.piano)
 
     # drumhat.on_hit(drumhat.PADS, handle_hit)
     # drumhat.on_release(drumhat.PADS, handle_release)
