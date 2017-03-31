@@ -55,8 +55,8 @@ def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
 class Drums:
     sounds = []
 
-    def __init__(self, instrument_dir):
-        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, instrument_dir, "*.wav"))
+    def __init__(self, sound_index):
+        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, sound_sets[sound_index], "*.wav"))
         sounds_path.sort(key=natural_sort_key)
         self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
 
@@ -70,10 +70,7 @@ class Drums:
     def handle_release(self):
         pass  
 
-# sound_set_index should be used by drums, too
-# instrument index could be handled with getter and setter...
-# MINOR BUG: index != chosen instrument because of bad sound_set index handling
-# maybe add a wrapper four outputting played sound?
+# maybe add a wrapper four outputting played sound  filename?
 class Piano:
     sounds = []
     octave = 0
@@ -88,12 +85,6 @@ class Piano:
         pianohat.on_octave_up(self.handle_octave_up)
         pianohat.on_octave_down(self.handle_octave_down)
         pianohat.on_instrument(self.handle_instrument)
-
-    # @property
-    # def sound_set(self, new_index):
-    #     self.sound_index = new_index
-    #     self.load_sounds()
-
 
     def load_sounds(self):
         sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
@@ -112,7 +103,6 @@ class Piano:
         if channel < len(self.sounds) and pressed:
             self.sounds[channel].play(loops=0)
 
-
     def handle_instrument(self, channel, pressed):
         if pressed:
             # merge to single line
@@ -124,7 +114,6 @@ class Piano:
         if pressed and self.octave < self.octaves:
             self.octave += 1
 
-
     def handle_octave_down(self, channel, pressed):
         if pressed and self.octave > 0:
             self.octave -= 1
@@ -133,7 +122,7 @@ class Piano:
 def start_band(args):
     """ Create Piano and Drums instances initialized with the sound set. """
 
-    drums = Drums(args.drums)
+    drums = Drums(sound_sets.index(args.drums))
     piano = Piano(sound_sets.index(args.piano))
 
     signal.pause()
