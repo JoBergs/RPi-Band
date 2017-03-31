@@ -67,25 +67,12 @@ class Instrument:
         self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]  
 
 class Drums(Instrument):
-    #sounds = []
 
     def __init__(self, sound_index):
         super(Drums, self).__init__(sound_index)
-        #self.sound_index = sound_index
-        #self.load_sounds()
-
-        # sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, sound_sets[sound_index], "*.wav"))
-        # sounds_path.sort(key=natural_sort_key)
-        # self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
 
         drumhat.on_hit(drumhat.PADS, self.handle_hit)
         drumhat.on_release(drumhat.PADS, self.handle_release)
-
-    # def load_sounds(self):
-    #     sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
-    #                                                sound_sets[self.sound_index], "*.wav"))
-    #     sounds_path.sort(key=natural_sort_key)
-    #     self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]  
 
     def handle_hit(self, event):
         # event.channel is a zero based channel index for each pad
@@ -96,19 +83,14 @@ class Drums(Instrument):
 
 # maybe add a wrapper four outputting played sound  filename?
 class Piano(Instrument):
-    # sounds = []
     octave = 0
     octaves = 0  
-    # sound_index = 0
 
     def __init__(self, sound_index):
         super(Piano, self).__init__(sound_index)
-        # self.sound_index = sound_index
-        # self.load_sounds()
 
         # it's prettier to overload load_sounds!
         self.set_octave()
-
 
         pianohat.on_note(self.handle_note)
         pianohat.on_octave_up(self.handle_octave_up)
@@ -120,19 +102,7 @@ class Piano(Instrument):
     def set_octave(self):
         self.octaves = len(self.sounds) / 12
         self.octave = int(self.octaves / 2)       
-
-    # def load_sounds(self):
-    #     sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
-    #                                                sound_sets[self.sound_index], "*.wav"))
-    #     #print(sounds_path)
-    #     sounds_path.sort(key=natural_sort_key)
-    #     self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]   
-    #     # i'm forgetting to reset the octave
-    #     # self.sounds[0].play(loops=0)
-    #     # self.sounds[0].play(loops=0)
-    #     # self.sounds[0].play(loops=0)
-    #     # self.sounds[0].play(loops=0)
-    #     #print("sounds: ", self.sounds)     
+  
 
     def handle_note(self, channel, pressed):
         channel = channel + (12 * self.octave)
@@ -145,9 +115,7 @@ class Piano(Instrument):
             # merge to single line
             self.sound_index += 1
             self.sound_index %= len(sound_sets)
-            #print(self.sound_index)
-            # import ipdb
-            # ipdb.set_trace()
+
             self.load_sounds()
             self.set_octave()
 
