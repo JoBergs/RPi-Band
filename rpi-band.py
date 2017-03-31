@@ -17,6 +17,9 @@ GPIO.setmode(GPIO.BCM)
 # button for turning on and off the rpi-band sits on pin 14 (GND) and pin 18(IO: 24 in BCM) in BOARD numbering
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
+# i'd like to see this in oop (shut up)
+# integrate 8 bit synthi
+
 
 PIANO_BANK = os.path.join(os.path.dirname(__file__), "sounds/")
 DRUM_BANK = os.path.join(os.path.dirname(__file__), "sounds/drums2")
