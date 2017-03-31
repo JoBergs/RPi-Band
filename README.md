@@ -26,4 +26,6 @@ PHOTO!
     cd ~/RPi-band
     python3 rpi-band.py
 
-[LINK ORIGINAL DOCS]
+# Autostart
+
+GIVE HELP FOR AUTOSTARTING (.bashrc should be sufficient)
