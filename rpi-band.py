@@ -25,8 +25,8 @@ GPIO.setmode(GPIO.BCM)
 # safe shutdown button is pin 14 (GND) and pin 18(IO: 24 in BCM) in BOARD numbering
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-PIANO_BANK = os.path.join(os.path.dirname(__file__), "sounds/")
-DRUM_BANK = os.path.join(os.path.dirname(__file__), "sounds/drums2")
+# PIANO_BANK = os.path.join(os.path.dirname(__file__), "sounds/")
+# DRUM_BANK = os.path.join(os.path.dirname(__file__), "sounds/drums2")
 
 def parse_arguments(sysargs):
     """ Setup the command line options. """
@@ -78,17 +78,26 @@ class Piano:
     sounds = []
     octave = 0
     octaves = 0  
-    sound_set_index = 0
+    sound_index = 0
 
-    def __init__(self, instrument_dir):
-        self.load_sounds(instrument_dir)
+    def __init__(self, start_index):
+        self.sound_index = start_index
+        #self.sound_set = start_index
+        self.load_sounds()
         pianohat.on_note(self.handle_note)
         pianohat.on_octave_up(self.handle_octave_up)
         pianohat.on_octave_down(self.handle_octave_down)
         pianohat.on_instrument(self.handle_instrument)
 
-    def load_sounds(self, instrument_dir):
-        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, instrument_dir, "*.wav"))
+    # @property
+    # def sound_set(self, new_index):
+    #     self.sound_index = new_index
+    #     self.load_sounds()
+
+
+    def load_sounds(self):
+        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
+                                                   sound_sets[self.sound_index], "*.wav"))
         sounds_path.sort(key=natural_sort_key)
         self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
 
@@ -106,9 +115,10 @@ class Piano:
 
     def handle_instrument(self, channel, pressed):
         if pressed:
-            self.sound_set_index += 1
-            self.sound_set_index %= len(sound_sets)
-            self.load_sounds(sound_sets[self.sound_set_index])
+            # merge to single line
+            self.sound_index += 1
+            self.sound_index %= len(sound_sets)
+            self.load_sounds()
 
     def handle_octave_up(self, channel, pressed):
         if pressed and self.octave < self.octaves:
@@ -124,7 +134,7 @@ def start_band(args):
     """ Create Piano and Drums instances initialized with the sound set. """
 
     drums = Drums(args.drums)
-    piano = Piano(args.piano)
+    piano = Piano(sound_sets.index(args.piano))
 
     signal.pause()
 
