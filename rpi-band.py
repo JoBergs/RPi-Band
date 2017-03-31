@@ -53,28 +53,67 @@ pygame.mixer.init()
 pygame.mixer.set_num_channels(32)
 
 # accept 8bit for the synthi, extend sound_sets by it but handle specially 
-SOUND_DIR = "sounds/"
-sound_bank = os.path.join(os.path.dirname(__file__), SOUNDS_DIR)
-sound_sets = glob.glob(os.path.join(SOUND_BANK, "*"))
+SOUND_BASEDIR = os.path.join(os.path.dirname(__file__), "sounds/")
+#sound_bank = os.path.join(os.path.dirname(__file__), SOUNDS_DIR)
+sound_sets = glob.glob(os.path.join(SOUND_BASEDIR, "*"))
 print(sound_sets)
+
+# class Instrument:
+#     sounds = []
+
+#     def __init__(self):
+#         self.load_sounds()
+
+#     # could accept a path
+#     def load_sounds(self):
+#         pass
+
+#     def handle_press(self):
+#         pass
+
+#     def handle_release(self):
+#         pass
+
+class Drums:
+    sounds = []
+
+    def __init__(self, args):
+        sounds_path = os.path.join(SOUND_BASEDIR, args.drums, "*.wav")
+        #self.load_sounds(args.sounds_path)
+        self.sounds = [pygame.mixer.Sound(f) for f in files_drum]
+        drumhat.on_hit(drumhat.PADS, self.handle_hit)
+        drumhat.on_release(drumhat.PADS, self.handle_release)
+
+    def handle_hit(self, event):
+        # event.channel is a zero based channel index for each pad
+        # event.pad is the pad number from 1 to 8
+        self.sounds[event.channel].play(loops=0)
+        #print("You hit pad {}, playing: {}".format(event.pad,files_drum[event.channel]))
+
+    def handle_release(self):
+        pass   
+
+    # def load_sounds(self, sounds_directory):
+    #     files_drum = glob.glob(os.path.join(DRUM_BANK, "*.wav"))
+
 
 ######### DRUMS
 
 
-files_drum = glob.glob(os.path.join(DRUM_BANK, "*.wav"))
-files_drum.sort()
+# files_drum = glob.glob(os.path.join(DRUM_BANK, "*.wav"))
+# files_drum.sort()
 
-samples_drum = [pygame.mixer.Sound(f) for f in files_drum]
+# samples_drum = [pygame.mixer.Sound(f) for f in files_drum]
 
 
-def handle_hit(event):
-    # event.channel is a zero based channel index for each pad
-    # event.pad is the pad number from 1 to 8
-    samples_drum[event.channel].play(loops=0)
-    print("You hit pad {}, playing: {}".format(event.pad,files_drum[event.channel]))
+# def handle_hit(event):
+#     # event.channel is a zero based channel index for each pad
+#     # event.pad is the pad number from 1 to 8
+#     samples_drum[event.channel].play(loops=0)
+#     print("You hit pad {}, playing: {}".format(event.pad,files_drum[event.channel]))
 
-def handle_release():
-    pass
+# def handle_release():
+#     pass
 
 ######## /DRUMS
 
@@ -144,8 +183,10 @@ def start_band(args):
 
     load_samples(patches[patch_index])
 
-    drumhat.on_hit(drumhat.PADS, handle_hit)
-    drumhat.on_release(drumhat.PADS, handle_release)
+    drums = Drums(args)
+
+    # drumhat.on_hit(drumhat.PADS, handle_hit)
+    # drumhat.on_release(drumhat.PADS, handle_release)
 
     signal.pause()
 
