@@ -1,2 +1,2 @@
-* abstract base class for Piano and Drum
+* forbid changing the octave for instuments with too little sound count
 * integrate 8bit synthi

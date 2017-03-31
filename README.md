@@ -4,7 +4,7 @@ LINK TO ARTICLE
 
 RPi-Band fuses the Pimoroni Piano HAT and Drum HAT code to a single software,
 which gives the possibility for playing two intruments on a single Raspberry Pi.
-The code in this repository is Python3.
+The code in this repository is Python3, but rewriting for Python2 should be no issue.
 
 # Parent GitHub repositories and original READMEs 
 Piano HAT: https://github.com/pimoroni/Piano-HAT
