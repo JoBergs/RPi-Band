@@ -53,7 +53,13 @@ pygame.mixer.set_num_channels(32)
 
 # accept 8bit for the synthi, extend sound_sets by it but handle specially 
 SOUND_BASEDIR = os.path.join(os.path.dirname(__file__), "sounds/")
+# replace this: we just want the subdirs
+# print(glob.glob("/path/to/directory/*/"))
+# import ipdb
+# ipdb.set_trace()
+
 sound_sets = glob.glob(os.path.join(SOUND_BASEDIR, "*"))
+print("test: ", sound_sets)
 
 def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
     return [int(text) if text.isdigit() else text.lower() for text in re.split(_nsre, s)]
@@ -68,6 +74,9 @@ class Drums:
         sounds_path.sort(key=natural_sort_key)
         self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
 
+        # import ipdb
+        # ipdb.set_trace()
+
         drumhat.on_hit(drumhat.PADS, self.handle_hit)
         drumhat.on_release(drumhat.PADS, self.handle_release)
 
@@ -77,13 +86,43 @@ class Drums:
         self.sounds[event.channel].play(loops=0)
 
     def handle_release(self):
-        pass   
+        pass  
+
+# class Piano:
+#     sounds = []
+#     octave = 0
+#     octaves = 0  
+
+#     def __init__(self, instrument_dir):
+#         self.handle_hit()
 
 
+#         def handle_note(self, channel, pressed):
+#             channel = channel + (12 * self.octave)
+#             # IS len(samples_piano) == len(sounds)??? YES
+
+#             if channel < len(self.sounds) and pressed:
+#                 # print('Playing Sound: {}'.format(files_piano[channel]))
+#                 self.sounds[channel].play(loops=0)
+
+#     def handle_release(self):
+#         pass    
+
+# class Test(object):
+#     def __init__(self):
+#         # import ipdb
+#         # ipdb.set_trace()
+#         self.blublub()
+
+#         def blublub(self):
+#             print('bla')
+
+# sound_set_index should be used by drums, too
 class Piano:
     sounds = []
     octave = 0
-    octaves = 0   
+    octaves = 0  
+    sound_set_index = 0
 
     def __init__(self, instrument_dir):
         # original piano uses extend which might be necessary because of mutability
@@ -94,6 +133,9 @@ class Piano:
         self.octaves = len(sounds_path) / 12
         self.octave = int(self.octaves / 2)
 
+        # import ipdb
+        # ipdb.set_trace()
+
         pianohat.on_note(self.handle_note)
         pianohat.on_octave_up(self.handle_octave_up)
         pianohat.on_octave_down(self.handle_octave_down)
@@ -101,95 +143,97 @@ class Piano:
 
         # pianohat.auto_leds(True)
 
-        def handle_note(self, channel, pressed):
-            channel = channel + (12 * self.octave)
-            # IS len(samples_piano) == len(sounds)???
-            if channel < len(samples_piano) and pressed:
-                # print('Playing Sound: {}'.format(files_piano[channel]))
-                self.sounds[channel].play(loops=0)
+    def handle_note(self, channel, pressed):
+        channel = channel + (12 * self.octave)
+        # IS len(samples_piano) == len(sounds)??? YES
+
+        if channel < len(self.sounds) and pressed:
+            # print('Playing Sound: {}'.format(files_piano[channel]))
+            self.sounds[channel].play(loops=0)
 
 
-        def handle_instrument(self, channel, pressed):
-            # global patch_index
-            if pressed:
-                patch_index += 1
-                # this needs the list of possible instruments in the class
-                patch_index %= len(patches)
-                # print('Selecting Patch: {}'.format(patches[patch_index]))
-                load_samples(patches[patch_index])
+    def handle_instrument(self, channel, pressed):
+        # global patch_index
+        if pressed:
+            self.sound_set_index += 1
+            # this needs the list of possible instruments in the class
+            self.sound_set_index %= len(patches)
+            # print('Selecting Patch: {}'.format(patches[patch_index]))
+            # load_samples need to be split off __init__
+            load_samples(patches[self.sound_set_index])
 
 
-        def handle_octave_up(self, channel, pressed):
-            # global octave
-            if pressed and self.octave < self.octaves:
-                self.octave += 1
-                #print('Selected Octave: {}'.format(octave))
+    def handle_octave_up(self, channel, pressed):
+        # global octave
+        if pressed and self.octave < self.octaves:
+            self.octave += 1
+            #print('Selected Octave: {}'.format(octave))
 
 
-        def handle_octave_down(self, channel, pressed):
-            # global octave
-            if pressed and self.octave > 0:
-                self.octave -= 1
-                #print('Selected Octave: {}'.format(octave))
+    def handle_octave_down(self, channel, pressed):
+        # global octave
+        if pressed and self.octave > 0:
+            self.octave -= 1
+            #print('Selected Octave: {}'.format(octave))
 
 
-samples_piano = []
-files_piano = []
-octave = 0
-octaves = 0
+# samples_piano = []
+# files_piano = []
+# octave = 0
+# octaves = 0
 
-patches = glob.glob(os.path.join(PIANO_BANK, '*'))
-patch_index = 1  # this is bad for selecting the piano; rethink sound management
-
-
-
-def load_samples(patch):
-    global samples_piano, files_piano, octaves, octave
-
-    files_piano = []
-    print('Loading samples_piano from: {}'.format(patch))
-
-    files_piano.extend(glob.glob(os.path.join(patch, "*.wav")))
-    files_piano.sort(key=natural_sort_key)    
-    samples_piano = [pygame.mixer.Sound(sample) for sample in files_piano]
-
-    octaves = len(files_piano) / 12
-    octave = int(octaves / 2)
+# patches = glob.glob(os.path.join(PIANO_BANK, '*'))
+# patch_index = 1  # this is bad for selecting the piano; rethink sound management
 
 
 
+# def load_samples(patch):
+#     global samples_piano, files_piano, octaves, octave
 
-pianohat.auto_leds(True)
+#     files_piano = []
+#     print('Loading samples_piano from: {}'.format(patch))
 
+#     files_piano.extend(glob.glob(os.path.join(patch, "*.wav")))
+#     # print("len files_piano: ", len(files_piano))
+#     files_piano.sort(key=natural_sort_key)    
+#     samples_piano = [pygame.mixer.Sound(sample) for sample in files_piano]
 
-def handle_note(channel, pressed):
-    channel = channel + (12 * octave)
-    if channel < len(samples_piano) and pressed:
-        print('Playing Sound: {}'.format(files_piano[channel]))
-        samples_piano[channel].play(loops=0)
-
-
-def handle_instrument(channel, pressed):
-    global patch_index
-    if pressed:
-        patch_index += 1
-        patch_index %= len(patches)
-        print('Selecting Patch: {}'.format(patches[patch_index]))
-        load_samples(patches[patch_index])
+#     octaves = len(files_piano) / 12
+#     octave = int(octaves / 2)
 
 
-def handle_octave_up(channel, pressed):
-    global octave
-    if pressed and octave < octaves:
-        octave += 1
-        print('Selected Octave: {}'.format(octave))
+# pianohat.auto_leds(True)
 
 
-def handle_octave_down(channel, pressed):
-    global octave
-    if pressed and octave > 0:
-        octave -= 1
-        print('Selected Octave: {}'.format(octave))
+# def handle_note(channel, pressed):
+#     channel = channel + (12 * octave)
+#     # print("len samples_piano: ", len(samples_piano))
+#     if channel < len(samples_piano) and pressed:
+#         print('Playing Sound: {}'.format(files_piano[channel]))
+#         samples_piano[channel].play(loops=0)
+
+
+# def handle_instrument(channel, pressed):
+#     global patch_index
+#     if pressed:
+#         patch_index += 1
+#         patch_index %= len(patches)
+#         print('Selecting Patch: {}'.format(patches[patch_index]))
+#         load_samples(patches[patch_index])
+
+
+# def handle_octave_up(channel, pressed):
+#     global octave
+#     if pressed and octave < octaves:
+#         octave += 1
+#         print('Selected Octave: {}'.format(octave))
+
+
+# def handle_octave_down(channel, pressed):
+#     global octave
+#     if pressed and octave > 0:
+#         octave -= 1
+#         print('Selected Octave: {}'.format(octave))
 
 def start_band(args):
     # pianohat.on_note(handle_note)
