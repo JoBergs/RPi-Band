@@ -25,19 +25,6 @@ GPIO.setmode(GPIO.BCM)
 # safe shutdown button is pin 14 (GND) and pin 18(IO: 24 in BCM) in BOARD numbering
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# PIANO_BANK = os.path.join(os.path.dirname(__file__), "sounds/")
-# DRUM_BANK = os.path.join(os.path.dirname(__file__), "sounds/drums2")
-
-def parse_arguments(sysargs):
-    """ Setup the command line options. """
-
-    parser = argparse.ArgumentParser(description=DESCRIPTION)
-
-    parser.add_argument('-p', '--piano', default='piano')
-    parser.add_argument('-d', '--drums', default='drums2')
-
-    return parser.parse_args(sysargs)
-
 # move into init
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
@@ -49,8 +36,24 @@ SOUND_BASEDIR = os.path.join(os.path.dirname(__file__), "sounds/")
 # list of all available soundsets
 sound_sets = [os.path.basename(tmp) for tmp in glob.glob(os.path.join(SOUND_BASEDIR, "*"))]
 
+
+def parse_arguments(sysargs):
+    """ Setup the command line options. """
+
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
+
+    parser.add_argument('-p', '--piano', default='piano')
+    parser.add_argument('-d', '--drums', default='drums2')
+
+    return parser.parse_args(sysargs)
+
+
 def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
     return [int(text) if text.isdigit() else text.lower() for text in re.split(_nsre, s)]
+
+class Instrument:
+    sounds = []
+    sound_index = 0
 
 class Drums:
     sounds = []
@@ -86,6 +89,8 @@ class Piano:
         pianohat.on_octave_down(self.handle_octave_down)
         pianohat.on_instrument(self.handle_instrument)
 
+        pianohat.auto_leds(True)
+
     def load_sounds(self):
         sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
                                                    sound_sets[self.sound_index], "*.wav"))
@@ -95,7 +100,7 @@ class Piano:
         self.octaves = len(sounds_path) / 12
         self.octave = int(self.octaves / 2)
 
-        pianohat.auto_leds(True)
+        
 
     def handle_note(self, channel, pressed):
         channel = channel + (12 * self.octave)
