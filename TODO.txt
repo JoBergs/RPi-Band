@@ -1,1 +1,3 @@
-* merge code
+* abstract base class for Piano and Drum
+* better sound set index handling
+* integrate 8bit synthi
