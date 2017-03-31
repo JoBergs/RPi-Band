@@ -55,12 +55,24 @@ class Instrument:
     sounds = []
     sound_index = 0
 
-class Drums:
-    sounds = []
-
     def __init__(self, sound_index):
         self.sound_index = sound_index
         self.load_sounds()
+
+    def load_sounds(self):
+        # print('loading sounds...')
+        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
+                                                   sound_sets[self.sound_index], "*.wav"))
+        sounds_path.sort(key=natural_sort_key)
+        self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]  
+
+class Drums(Instrument):
+    #sounds = []
+
+    def __init__(self, sound_index):
+        super(Drums, self).__init__(sound_index)
+        #self.sound_index = sound_index
+        #self.load_sounds()
 
         # sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, sound_sets[sound_index], "*.wav"))
         # sounds_path.sort(key=natural_sort_key)
@@ -69,11 +81,11 @@ class Drums:
         drumhat.on_hit(drumhat.PADS, self.handle_hit)
         drumhat.on_release(drumhat.PADS, self.handle_release)
 
-    def load_sounds(self):
-        sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
-                                                   sound_sets[self.sound_index], "*.wav"))
-        sounds_path.sort(key=natural_sort_key)
-        self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]  
+    # def load_sounds(self):
+    #     sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
+    #                                                sound_sets[self.sound_index], "*.wav"))
+    #     sounds_path.sort(key=natural_sort_key)
+    #     self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]  
 
     def handle_hit(self, event):
         # event.channel is a zero based channel index for each pad
@@ -90,6 +102,7 @@ class Piano:
     sound_index = 0
 
     def __init__(self, sound_index):
+        # super(Piano, self).__init__(sound_index)
         self.sound_index = sound_index
         self.load_sounds()
 
@@ -106,8 +119,10 @@ class Piano:
     def load_sounds(self):
         sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
                                                    sound_sets[self.sound_index], "*.wav"))
+        print(sounds_path)
         sounds_path.sort(key=natural_sort_key)
-        self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]        
+        self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]   
+        print("sounds: ", self.sounds)     
 
     def handle_note(self, channel, pressed):
         channel = channel + (12 * self.octave)
@@ -120,6 +135,8 @@ class Piano:
             # merge to single line
             self.sound_index += 1
             self.sound_index %= len(sound_sets)
+            # import ipdb
+            # ipdb.set_trace()
             self.load_sounds()
 
     def handle_octave_up(self, channel, pressed):
