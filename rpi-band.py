@@ -25,13 +25,6 @@ GPIO.setmode(GPIO.BCM)
 # safe shutdown button is pin 14 (GND) and pin 18(IO: 24 in BCM) in BOARD numbering
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# sound loader:
-#   make a list of dirs
-#   preload from CLI
-#   stay constant for drums, iterate over for piano
-
-
-
 PIANO_BANK = os.path.join(os.path.dirname(__file__), "sounds/")
 DRUM_BANK = os.path.join(os.path.dirname(__file__), "sounds/drums2")
 
@@ -62,8 +55,6 @@ def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
 class Drums:
     sounds = []
 
-    # this could be reused if args.drums is handled differently
-    # Yes: pass instrument, not args
     def __init__(self, instrument_dir):
         sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, instrument_dir, "*.wav"))
         sounds_path.sort(key=natural_sort_key)
@@ -74,7 +65,6 @@ class Drums:
 
     def handle_hit(self, event):
         # event.channel is a zero based channel index for each pad
-        # event.pad is the pad number from 1 to 8
         self.sounds[event.channel].play(loops=0)
 
     def handle_release(self):
@@ -83,6 +73,7 @@ class Drums:
 # sound_set_index should be used by drums, too
 # instrument index could be handled with getter and setter...
 # MINOR BUG: index != chosen instrument because of bad sound_set index handling
+# maybe add a wrapper four outputting played sound?
 class Piano:
     sounds = []
     octave = 0
@@ -90,19 +81,13 @@ class Piano:
     sound_set_index = 0
 
     def __init__(self, instrument_dir):
-        
-
         self.load_sounds(instrument_dir)
-        # import ipdb
-        # ipdb.set_trace()
-
         pianohat.on_note(self.handle_note)
         pianohat.on_octave_up(self.handle_octave_up)
         pianohat.on_octave_down(self.handle_octave_down)
         pianohat.on_instrument(self.handle_instrument)
 
     def load_sounds(self, instrument_dir):
-        # original piano uses extend which might be necessary because of mutability
         sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, instrument_dir, "*.wav"))
         sounds_path.sort(key=natural_sort_key)
         self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
@@ -110,113 +95,36 @@ class Piano:
         self.octaves = len(sounds_path) / 12
         self.octave = int(self.octaves / 2)
 
-        # pianohat.auto_leds(True)
+        pianohat.auto_leds(True)
 
     def handle_note(self, channel, pressed):
         channel = channel + (12 * self.octave)
-        # IS len(samples_piano) == len(sounds)??? YES
 
         if channel < len(self.sounds) and pressed:
-            # print('Playing Sound: {}'.format(files_piano[channel]))
             self.sounds[channel].play(loops=0)
 
 
     def handle_instrument(self, channel, pressed):
-        # global patch_index
         if pressed:
             self.sound_set_index += 1
-            # this needs the list of possible instruments in the class
             self.sound_set_index %= len(sound_sets)
-            # print('Selecting Patch: {}'.format(patches[patch_index]))
-            # load_samples need to be split off __init__
             self.load_sounds(sound_sets[self.sound_set_index])
 
-
     def handle_octave_up(self, channel, pressed):
-        # global octave
         if pressed and self.octave < self.octaves:
             self.octave += 1
-            #print('Selected Octave: {}'.format(octave))
 
 
     def handle_octave_down(self, channel, pressed):
-        # global octave
         if pressed and self.octave > 0:
             self.octave -= 1
-            #print('Selected Octave: {}'.format(octave))
 
-
-# samples_piano = []
-# files_piano = []
-# octave = 0
-# octaves = 0
-
-# patches = glob.glob(os.path.join(PIANO_BANK, '*'))
-# patch_index = 1  # this is bad for selecting the piano; rethink sound management
-
-
-
-# def load_samples(patch):
-#     global samples_piano, files_piano, octaves, octave
-
-#     files_piano = []
-#     print('Loading samples_piano from: {}'.format(patch))
-
-#     files_piano.extend(glob.glob(os.path.join(patch, "*.wav")))
-#     # print("len files_piano: ", len(files_piano))
-#     files_piano.sort(key=natural_sort_key)    
-#     samples_piano = [pygame.mixer.Sound(sample) for sample in files_piano]
-
-#     octaves = len(files_piano) / 12
-#     octave = int(octaves / 2)
-
-
-# pianohat.auto_leds(True)
-
-
-# def handle_note(channel, pressed):
-#     channel = channel + (12 * octave)
-#     # print("len samples_piano: ", len(samples_piano))
-#     if channel < len(samples_piano) and pressed:
-#         print('Playing Sound: {}'.format(files_piano[channel]))
-#         samples_piano[channel].play(loops=0)
-
-
-# def handle_instrument(channel, pressed):
-#     global patch_index
-#     if pressed:
-#         patch_index += 1
-#         patch_index %= len(patches)
-#         print('Selecting Patch: {}'.format(patches[patch_index]))
-#         load_samples(patches[patch_index])
-
-
-# def handle_octave_up(channel, pressed):
-#     global octave
-#     if pressed and octave < octaves:
-#         octave += 1
-#         print('Selected Octave: {}'.format(octave))
-
-
-# def handle_octave_down(channel, pressed):
-#     global octave
-#     if pressed and octave > 0:
-#         octave -= 1
-#         print('Selected Octave: {}'.format(octave))
 
 def start_band(args):
-    # pianohat.on_note(handle_note)
-    # pianohat.on_octave_up(handle_octave_up)
-    # pianohat.on_octave_down(handle_octave_down)
-    # pianohat.on_instrument(handle_instrument)
-
-    # load_samples(patches[patch_index])
+    """ Create Piano and Drums instances initialized with the sound set. """
 
     drums = Drums(args.drums)
     piano = Piano(args.piano)
-
-    # drumhat.on_hit(drumhat.PADS, handle_hit)
-    # drumhat.on_release(drumhat.PADS, handle_release)
 
     signal.pause()
 
@@ -233,7 +141,6 @@ if __name__ == "__main__":
     # optional shutdown button
     GPIO.add_event_detect(24, edge=GPIO.FALLING, callback=turn_off) 
     args = parse_arguments(sys.argv[1:]) 
-    print(args)
     start_band(args)
 
 
