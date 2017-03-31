@@ -53,13 +53,9 @@ pygame.mixer.set_num_channels(32)
 
 # accept 8bit for the synthi, extend sound_sets by it but handle specially 
 SOUND_BASEDIR = os.path.join(os.path.dirname(__file__), "sounds/")
-# replace this: we just want the subdirs
-# print(glob.glob("/path/to/directory/*/"))
-# import ipdb
-# ipdb.set_trace()
 
-sound_sets = glob.glob(os.path.join(SOUND_BASEDIR, "*"))
-print("test: ", sound_sets)
+# list of all available soundsets
+sound_sets = [os.path.basename(tmp) for tmp in glob.glob(os.path.join(SOUND_BASEDIR, "*"))]
 
 def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
     return [int(text) if text.isdigit() else text.lower() for text in re.split(_nsre, s)]
@@ -74,9 +70,6 @@ class Drums:
         sounds_path.sort(key=natural_sort_key)
         self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]
 
-        # import ipdb
-        # ipdb.set_trace()
-
         drumhat.on_hit(drumhat.PADS, self.handle_hit)
         drumhat.on_release(drumhat.PADS, self.handle_release)
 
@@ -87,35 +80,6 @@ class Drums:
 
     def handle_release(self):
         pass  
-
-# class Piano:
-#     sounds = []
-#     octave = 0
-#     octaves = 0  
-
-#     def __init__(self, instrument_dir):
-#         self.handle_hit()
-
-
-#         def handle_note(self, channel, pressed):
-#             channel = channel + (12 * self.octave)
-#             # IS len(samples_piano) == len(sounds)??? YES
-
-#             if channel < len(self.sounds) and pressed:
-#                 # print('Playing Sound: {}'.format(files_piano[channel]))
-#                 self.sounds[channel].play(loops=0)
-
-#     def handle_release(self):
-#         pass    
-
-# class Test(object):
-#     def __init__(self):
-#         # import ipdb
-#         # ipdb.set_trace()
-#         self.blublub()
-
-#         def blublub(self):
-#             print('bla')
 
 # sound_set_index should be used by drums, too
 class Piano:
