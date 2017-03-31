@@ -26,6 +26,12 @@ GPIO.setmode(GPIO.BCM)
 # safe shutdown button is pin 14 (GND) and pin 18(IO: 24 in BCM) in BOARD numbering
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
+# sound loader:
+#   make a list of dirs
+#   preload from CLI
+#   stay constant for drums, iterate over for piano
+
+
 
 PIANO_BANK = os.path.join(os.path.dirname(__file__), "sounds/")
 DRUM_BANK = os.path.join(os.path.dirname(__file__), "sounds/drums2")
@@ -41,10 +47,16 @@ def parse_arguments(sysargs):
 
     return parser.parse_args(sysargs)
 
-
+# move into init
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
 pygame.mixer.set_num_channels(32)
+
+# accept 8bit for the synthi, extend sound_sets by it but handle specially 
+SOUND_DIR = "sounds/"
+sound_bank = os.path.join(os.path.dirname(__file__), SOUNDS_DIR)
+sound_sets = glob.glob(os.path.join(SOUND_BANK, "*"))
+print(sound_sets)
 
 ######### DRUMS
 
