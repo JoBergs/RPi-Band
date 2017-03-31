@@ -31,10 +31,26 @@ GPIO.setmode(GPIO.BCM)
 # safe shutdown button is pin 14 (GND) and pin 18(IO: 24 in BCM) in BOARD numbering
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
+# It might be very impossible to run the drums and the 8bit synthi concurrently
+# maybe on another core
+# switching rates, even if very fast, is probably impossible
+# BS, drums will just be 8bit then
+# test switching the bitrate with mixer.quit(), then recreating it
 
-pygame.mixer.pre_init(44100, -16, 1, 512)
-pygame.mixer.init()
-pygame.mixer.set_num_channels(32)
+
+MIXER_NORMAL = (44100, -16, 1, 512)
+MIXER_8BIT = (44100, -8, 4, 256)
+
+
+def set_mixer(mixer_values):
+
+    pygame.mixer.quit()
+    pygame.mixer.pre_init(*mixer_values)
+    pygame.mixer.init()
+    pygame.mixer.set_num_channels(32)
+
+set_mixer(MIXER_NORMAL)
+#set_mixer(MIXER_8BIT)
 
 
 def parse_arguments(sysargs):
