@@ -37,6 +37,8 @@ GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # BS, drums will just be 8bit then
 # test switching the bitrate with mixer.quit(), then recreating it
 
+# we need a different way for toggeling sine, square ect.: octave up/down needs to iterate over a list of all possible combinations
+
 
 MIXER_NORMAL = (44100, -16, 1, 512)
 MIXER_8BIT = (44100, -8, 4, 256)
