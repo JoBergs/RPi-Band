@@ -1,0 +1,6 @@
+v0.10 Plain merge of original Pimoroni drum and piano HAT code
+v0.11 Piano and Drum HAT code now in (buggy) OOP
+v0.12 Added function for setting pygame.mixer to NORMAL or 8BIT
+v0.13 Recreate Piano instance everytime the instrument button is pressed
+v0.14 integrated basic 8bit synthi
+v0.15 switching wave types for synthi on octave up or down works
