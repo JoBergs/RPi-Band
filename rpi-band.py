@@ -68,7 +68,7 @@ enabled = {'sine':True, 'saw':False, 'square':False}
 legal_waves = [[x, y, z] for x in [True, False] for y in [True, False] for z in [True, False]]
 legal_waves.remove([False, False, False])  # no waves gives no sound
 legal_waves.remove([False, True, False])  # only saw gives no sound (bug?)
-print(legal_waves)
+#print(legal_waves)
 
 notes = {'sine':[],'saw':[],'square':[]}
 
@@ -223,8 +223,7 @@ class Piano(Instrument):
     def load_sounds(self):
         set_mixer(self.mixer_settings)  # reset mixer to normal mode
 
-        super(Piano, self).load_sounds()
-
+        super(Piano, self).load_sounds()        
         self.octaves = len(self.sounds) / 12
         self.octave = int(self.octaves / 2)   
 
