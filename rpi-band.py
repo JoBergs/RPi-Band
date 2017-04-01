@@ -98,6 +98,30 @@ class Drums(Instrument):
     def handle_release(self):
         pass  
 
+# sooooo.... what's better? make 8bit an own class that can't be changed with the instrument button?
+# GOAL: create new instruments everytime the instrument button is pushed
+#           that's the first step,
+#           then make 8bit synthi an instrument
+
+# would a tiny factory suffice?
+#   
+
+class Container:
+    """ Container is a factory for creating instruments, necessary for 
+    switching to 8-bit piano """
+
+    piano = None
+    drums = None
+
+    def __init__(self, piano_type, drums_type):
+        self.create_instruments(piano_type, drums_type)
+
+    def create_instruments(self, piano_type, drums_type):
+        drums = Drums(sound_sets.index(args.drums))
+        piano = Piano(sound_sets.index(args.piano))
+
+        signal.pause()
+
 # maybe add a wrapper four outputting played sound  filename?
 class Piano(Instrument):
     octave = 0
@@ -107,6 +131,8 @@ class Piano(Instrument):
         if sound_sets[sound_index] == '8bit':
             print("\n8bit!!!\n")
             set_mixer(MIXER_8BIT)
+            pianohat.auto_leds(False)
+
         else:
             super(Piano, self).__init__(sound_index)
 
@@ -159,9 +185,4 @@ if __name__ == "__main__":
     GPIO.add_event_detect(24, edge=GPIO.FALLING, callback=turn_off) 
     args = parse_arguments(sys.argv[1:]) 
 
-    drums = Drums(sound_sets.index(args.drums))
-    piano = Piano(sound_sets.index(args.piano))
-
-    signal.pause()
-
-
+    container = Container(sound_sets.index(args.drums), sound_sets.index(args.piano))
