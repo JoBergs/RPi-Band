@@ -80,14 +80,10 @@ class Instrument:
         self.load_sounds()
 
     def load_sounds(self):
-        # print('1 ', self.sounds)
         sounds_path = glob.glob(os.path.join(SOUND_BASEDIR, 
                                                    sound_sets[self.sound_index], "*.wav"))
         sounds_path.sort(key=natural_sort_key)
         self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]  
-        # print('2 ', self.sounds)
-        # so, the sounds are loaded, but the program execution halts
-        # try creating a piano twice without the container
 
 class Drums(Instrument):
 
@@ -126,18 +122,8 @@ class Container:
         signal.pause()
 
     def create_piano(self, piano_index):
-        # could be a garbage collection issue
-
-        self.piano = None
-
-        #print('bla1 ', piano_index)
         self.piano = Piano(self, piano_index)
 
-        # could it be the signal.pause?
-
-        # it might be: drums still running, no signal.pause requried for second run
-
-       
 
 # maybe add a wrapper four outputting played sound  filename?
 class Piano(Instrument):
@@ -158,8 +144,7 @@ class Piano(Instrument):
         pianohat.auto_leds(True)
 
     def load_sounds(self):
-        # OFF for testing
-        #set_mixer(MIXER_NORMAL)  # reset mixer to normal mode
+        set_mixer(MIXER_NORMAL)  # reset mixer to normal mode
 
         super(Piano, self).load_sounds()
 
@@ -174,19 +159,9 @@ class Piano(Instrument):
             self.sounds[channel].play(loops=0)
 
     def handle_instrument(self, channel, pressed):
-
         if pressed:
             self.sound_index = (self.sound_index + 1) % len(sound_sets)
-            
-            # redefining piano simply doesn't work...
-            # import ipdb
-            # ipdb.set_trace()
-
-
             self.container.create_piano(self.sound_index)
-            
-            # not necessary anymore, rethink
-            # self.load_sounds()
 
     def handle_octave_up(self, channel, pressed):
         if pressed and self.octave < int(self.octaves) - 1:
@@ -211,4 +186,3 @@ if __name__ == "__main__":
     args = parse_arguments(sys.argv[1:]) 
 
     container = Container(sound_sets.index(args.piano), sound_sets.index(args.drums))
-    #piano = Piano
