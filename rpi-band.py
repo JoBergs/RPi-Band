@@ -37,11 +37,6 @@ GPIO.setmode(GPIO.BCM)
 # safe shutdown button is pin 14 (GND) and pin 18(IO: 24 in BCM) in BOARD numbering
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-<<<<<<< HEAD
-# i'd like to see this in oop (shut up)
-# integrate 8 bit synthi
-
-=======
 MIXER_NORMAL = (44100, -16, 1, 512)
 MIXER_8BIT = (44100, -8, 4, 256)
 
@@ -75,8 +70,6 @@ LEGAL_WAVES.remove([False, False, False])  # no waves gives no sound
 LEGAL_WAVES.remove([False, False, True])  # only saw gives no sound (bug?)
 
 notes = {'sine':[],'saw':[],'square':[]}
->>>>>>> dev
-
 
 # The samples are 8bit signed, from -127 to +127
 # so the max amplitude of a sample is 127
