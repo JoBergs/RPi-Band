@@ -47,8 +47,8 @@ def set_mixer(mixer_values):
     pygame.mixer.init()
     pygame.mixer.set_num_channels(32)
 
-# TESTESTSET
-# set_mixer(MIXER_NORMAL)
+# needs to be 8bit first for generating samples; is changed according to
+# the chosen instrument later on
 set_mixer(MIXER_8BIT)
 
 ############## synthi constants
@@ -68,7 +68,6 @@ enabled = {'sine':True, 'saw':False, 'square':False}
 LEGAL_WAVES = [[x, y, z] for x in [True, False] for y in [True, False] for z in [True, False]]
 LEGAL_WAVES.remove([False, False, False])  # no waves gives no sound
 LEGAL_WAVES.remove([False, False, True])  # only saw gives no sound (bug?)
-#print(LEGAL_WAVES)
 
 notes = {'sine':[],'saw':[],'square':[]}
 
@@ -79,17 +78,20 @@ max_sample = 2**(BITRATE - 1) - 1
 
 def wave_sine(freq, time):
     """Generates a single sine wave sample"""
+
     s = math.sin(2*math.pi*freq*time)
     return int(round(max_sample * s ))
 
 
 def wave_square(freq, time):
     """Generates a single square wave sample"""
+
     return -max_sample if freq*time < 0.5 else max_sample
 
 
 def wave_saw(freq, time):
     """Generates a single sav wave sample"""
+
     s = ((freq*time)*2) - 1
     return int(round(max_sample * s)) 
 
@@ -165,8 +167,8 @@ class Container:
 
     def create_piano(self, piano_index):
         if sound_sets[piano_index] == '8bit':
-            # TESTING: set sounds to piano
-            self.piano = Synthesizer(self, 1)
+            # synthi needs no sound_index, 0 is a dummy value
+            self.piano = Synthesizer(self, 0)  
         else:
             self.piano = Piano(self, piano_index)
 
