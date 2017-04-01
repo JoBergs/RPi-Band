@@ -37,8 +37,9 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 ############## synthi constants
+SAMPLERATE = 44100
+BITRATE = 8
 
-BITRATE = 44100
 ATTACK_MS = 25
 RELEASE_MS = 500
 
@@ -69,6 +70,26 @@ def wave_saw(freq, time):
     """Generates a single sav wave sample"""
     s = ((freq*time)*2) - 1
     return int(round(max_sample * s)) 
+
+# IMPORTANT
+def generate_sample(frequency, volume=1.0, wavetype=None):
+    """Generates a sample of a specific frequency and wavetype"""
+    if wavetype is None:
+        wavetype = wave_square
+
+    sample_count = int(round(SAMPLERATE/frequency))
+
+    buf = numpy.zeros((sample_count, 2), dtype = numpy.int8)
+
+    for s in range(sample_count):
+        t = float(s)/SAMPLERATE # Time index
+        buf[s][0] = wavetype(frequency, t)
+        buf[s][1] = buf[s][0] # Copy to stero channel
+
+    sound = pygame.sndarray.make_sound(buf)
+    sound.set_volume(volume) # Set the volume to balance sounds
+
+    return sound
 
 # generate samples
 for f in [
@@ -288,28 +309,6 @@ def play_sample(channel, pressed):
     else:
         for t in wavetypes:
             notes[t][channel].fadeout(RELEASE_MS)
-
-# IMPORTANT
-def generate_sample(frequency, volume=1.0, wavetype=None):
-    """Generates a sample of a specific frequency and wavetype"""
-    if wavetype is None:
-        wavetype = wave_square
-
-    sample_count = int(round(SAMPLERATE/frequency))
-
-    buf = numpy.zeros((sample_count, 2), dtype = numpy.int8)
-
-    for s in range(sample_count):
-        t = float(s)/SAMPLERATE # Time index
-        buf[s][0] = wavetype(frequency, t)
-        buf[s][1] = buf[s][0] # Copy to stero channel
-
-    sound = pygame.sndarray.make_sound(buf)
-    sound.set_volume(volume) # Set the volume to balance sounds
-
-    return sound
-
-
 
 
 ############## /synthi code
