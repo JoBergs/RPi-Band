@@ -3,6 +3,7 @@
 import argparse
 import glob
 import math
+import numpy
 import os
 import pygame
 import re
@@ -35,6 +36,18 @@ GPIO.setmode(GPIO.BCM)
 
 # safe shutdown button is pin 14 (GND) and pin 18(IO: 24 in BCM) in BOARD numbering
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+MIXER_NORMAL = (44100, -16, 1, 512)
+MIXER_8BIT = (44100, -8, 4, 256)
+
+# needs to happen before generate_samples
+def set_mixer(mixer_values):
+    pygame.mixer.quit()
+    pygame.mixer.pre_init(*mixer_values)
+    pygame.mixer.init()
+    pygame.mixer.set_num_channels(32)
+
+set_mixer(MIXER_NORMAL)
 
 ############## synthi constants
 SAMPLERATE = 44100
@@ -126,19 +139,6 @@ def parse_arguments(sysargs):
 
 def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
     return [int(text) if text.isdigit() else text.lower() for text in re.split(_nsre, s)]
-
-
-MIXER_NORMAL = (44100, -16, 1, 512)
-MIXER_8BIT = (44100, -8, 4, 256)
-
-def set_mixer(mixer_values):
-
-    pygame.mixer.quit()
-    pygame.mixer.pre_init(*mixer_values)
-    pygame.mixer.init()
-    pygame.mixer.set_num_channels(32)
-
-set_mixer(MIXER_NORMAL)
 
 
 class Container:
