@@ -67,7 +67,7 @@ enabled = {'sine':True, 'saw':False, 'square':False}
 # build a list of legal wave type combinations
 LEGAL_WAVES = [[x, y, z] for x in [True, False] for y in [True, False] for z in [True, False]]
 LEGAL_WAVES.remove([False, False, False])  # no waves gives no sound
-LEGAL_WAVES.remove([False, True, False])  # only saw gives no sound (bug?)
+LEGAL_WAVES.remove([False, False, True])  # only saw gives no sound (bug?)
 #print(LEGAL_WAVES)
 
 notes = {'sine':[],'saw':[],'square':[]}
@@ -263,6 +263,12 @@ class Synthesizer(Piano):
         """
         # OFF for testing
         #pianohat.set_led(channel, pressed)
+
+        print('wave descriptions ', wavetypes)
+        print('wavetype index is ', self.wavetype_index)
+        print('which gives ', LEGAL_WAVES[self.wavetype_index])
+
+        # recheck false, false, true which is sine saw
         
         if pressed:
 

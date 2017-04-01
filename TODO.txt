@@ -3,3 +3,4 @@
 * visualize sound generation! 
     a row of colored, splintered bars
 * BUG: after synthi was selected once, no ay back to the piano!
+* modularize: file instruments.py

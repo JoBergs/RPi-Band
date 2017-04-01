@@ -79,6 +79,8 @@ def play_sample(channel, pressed):
     """
     pianohat.set_led(channel, pressed)
 
+    print(enabled)
+
     if pressed:
         for t in wavetypes:
             if enabled[t]:
