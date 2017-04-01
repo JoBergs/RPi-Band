@@ -27,8 +27,7 @@ SOUND_BASEDIR = os.path.join(os.path.dirname(__file__), "sounds/")
 # list of all available soundsets
 sound_sets = [os.path.basename(tmp) for tmp in glob.glob(os.path.join(SOUND_BASEDIR, "*"))]
 
-# OFF for refactoring
-#sound_sets.append("8bit")
+sound_sets.append("8bit")
 
 GPIO.setmode(GPIO.BCM)
 
@@ -129,7 +128,8 @@ class Container:
 class Piano(Instrument):
     octave = 0
     octaves = 0 
-    container = None 
+    container = None
+    mixer_settings = MIXER_NORMAL
 
     def __init__(self, container, sound_index):
         super(Piano, self).__init__(sound_index)
@@ -144,7 +144,7 @@ class Piano(Instrument):
         pianohat.auto_leds(True)
 
     def load_sounds(self):
-        set_mixer(MIXER_NORMAL)  # reset mixer to normal mode
+        set_mixer(self.mixer_settings)  # reset mixer to normal mode
 
         super(Piano, self).load_sounds()
 
@@ -170,6 +170,12 @@ class Piano(Instrument):
     def handle_octave_down(self, channel, pressed):
         if pressed and self.octave > 0:
             self.octave -= 1
+
+class 8BitSynth(Piano):
+    mixer_settings = MIXER_8BIT
+
+     def __init__(self, container, sound_index):
+        super(8BitSynth, self).__init__(sound_index)   
 
 
 def turn_off(pin):
