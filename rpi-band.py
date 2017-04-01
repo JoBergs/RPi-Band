@@ -106,7 +106,7 @@ class Piano(Instrument):
     def __init__(self, sound_index):
         if sound_sets[sound_index] == '8bit':
             print("\n8bit!!!\n")
-            pass
+            set_mixer(MIXER_8BIT)
         else:
             super(Piano, self).__init__(sound_index)
 
