@@ -64,6 +64,11 @@ volume = {'sine':0.8, 'saw':0.4, 'square':0.4}
 wavetypes = ['sine','saw','square']
 enabled = {'sine':True, 'saw':False, 'square':False}
 
+# build a list of legal wave type combinations
+legal_waves = [[x, y, z] for x in [True, False] for y in [True, False] for z in [True, False]]
+legal_waves.remove([False, False, False])  # no waves gives no sound
+legal_waves.remove([False, True, False])  # only saw gives no sound (bug?)
+print(legal_waves)
 
 notes = {'sine':[],'saw':[],'square':[]}
 

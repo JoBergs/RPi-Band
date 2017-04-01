@@ -78,6 +78,7 @@ def play_sample(channel, pressed):
     Any enabled samples are played, and *all* samples are turned off is a key is released
     """
     pianohat.set_led(channel, pressed)
+
     if pressed:
         for t in wavetypes:
             if enabled[t]:
