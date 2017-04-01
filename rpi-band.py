@@ -210,4 +210,4 @@ if __name__ == "__main__":
     GPIO.add_event_detect(24, edge=GPIO.FALLING, callback=turn_off) 
     args = parse_arguments(sys.argv[1:]) 
 
-    container = Container(sound_sets.index(args.drums), sound_sets.index(args.piano))
+    container = Container(sound_sets.index(args.piano), sound_sets.index(args.drums))
