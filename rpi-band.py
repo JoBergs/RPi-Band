@@ -106,13 +106,7 @@ class Drums(Instrument):
 #           then make 8bit synthi an instrument
 
 # would a tiny factory suffice?
-#   
 
-# rethink piano index management
-
-# now, drums and piano are inverted
-
-# ok so this is stupid: Container and the instruments both receive an sound_index
 
 class Container:
     """ Container is a factory for creating instruments, necessary for 
@@ -126,20 +120,12 @@ class Container:
         self.create_piano(piano_index)
 
     def create_piano(self, piano_index):
-        # This looks stupid. pass index instead? -> yes
-        # nono static method is no good
         # could be a garbage collection issue
 
-        # if self.piano:
-        
-        # NECESSARY?
-        # self.piano = None
         print('bla1 ', piano_index)
         self.piano = Piano(self, piano_index)
 
         signal.pause()
-
-# for now, i'll simply pass a reference to the container
 
 # maybe add a wrapper four outputting played sound  filename?
 class Piano(Instrument):
@@ -148,28 +134,9 @@ class Piano(Instrument):
     container = None 
 
     def __init__(self, container, sound_index):
-        # the line below happens in super
-        #self.sound_index = sound_index
-        
-
-        # ok something is messed up with multiple definitions of sound_index
-
-        
-
-        # if sound_sets[sound_index] == '8bit':
-        #     print("\n8bit!!!\n")
-        #     set_mixer(MIXER_8BIT)
-        #     pianohat.auto_leds(False)
-
-        # else:
-
-        # it's printed only once because it's called only once!
-        # print('bla1 ', self.sound_index)
-
         super(Piano, self).__init__(sound_index)
 
         self.container = container
-        # print('bla2 ', self.sound_index)
 
         pianohat.on_note(self.handle_note)
         pianohat.on_octave_up(self.handle_octave_up)
@@ -194,12 +161,6 @@ class Piano(Instrument):
             self.sounds[channel].play(loops=0)
 
     def handle_instrument(self, channel, pressed):
-        # this needs to call the parents function create_instruments
-
-        # would be using a static method appropriate?
-
-        # import ipdb
-        # ipdb.set_trace()
 
         if pressed:
             self.sound_index = (self.sound_index + 1) % len(sound_sets)
