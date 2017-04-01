@@ -13,10 +13,11 @@ import drumhat
 import pianohat
 import RPi.GPIO as GPIO
 
-DESCRIPTION = '''This script integrates Pimoronis Piano HAT and Drum HAT software and gives you simple, 
-ready-to-play instruments which use .wav files located in sounds.
+DESCRIPTION = '''This script integrates Pimoronis Piano HAT and Drum HAT software and gives you simple, ready-to-play instruments which use .wav files located in sounds.
 The parameter -p expects the name of the directory containing the sounds that should be loaded onto the piano HAT first
 and -d expects the name of the directory containing the sounds that should be loaded onto the drum HAT.
+For the 8-Bit-synthesizer, pass "8bit" for -p.
+
 
 Press CTRL+C to exit.'''
 
@@ -25,6 +26,7 @@ SOUND_BASEDIR = os.path.join(os.path.dirname(__file__), "sounds/")
 
 # list of all available soundsets
 sound_sets = [os.path.basename(tmp) for tmp in glob.glob(os.path.join(SOUND_BASEDIR, "*"))]
+sound_sets.append("8bit")
 
 GPIO.setmode(GPIO.BCM)
 
@@ -40,21 +42,6 @@ GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # we need a different way for toggeling sine, square ect.: octave up/down needs to iterate over a list of all possible combinations
 
 
-MIXER_NORMAL = (44100, -16, 1, 512)
-MIXER_8BIT = (44100, -8, 4, 256)
-
-
-def set_mixer(mixer_values):
-
-    pygame.mixer.quit()
-    pygame.mixer.pre_init(*mixer_values)
-    pygame.mixer.init()
-    pygame.mixer.set_num_channels(32)
-
-set_mixer(MIXER_NORMAL)
-#set_mixer(MIXER_8BIT)
-
-
 def parse_arguments(sysargs):
     """ Setup the command line options. """
 
@@ -67,6 +54,19 @@ def parse_arguments(sysargs):
 
 def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
     return [int(text) if text.isdigit() else text.lower() for text in re.split(_nsre, s)]
+
+
+MIXER_NORMAL = (44100, -16, 1, 512)
+MIXER_8BIT = (44100, -8, 4, 256)
+
+def set_mixer(mixer_values):
+
+    pygame.mixer.quit()
+    pygame.mixer.pre_init(*mixer_values)
+    pygame.mixer.init()
+    pygame.mixer.set_num_channels(32)
+
+set_mixer(MIXER_NORMAL)
 
 
 class Instrument:
@@ -104,16 +104,22 @@ class Piano(Instrument):
     octaves = 0  
 
     def __init__(self, sound_index):
-        super(Piano, self).__init__(sound_index)
+        if sound_sets[sound_index] == '8bit':
+            print("\n8bit!!!\n")
+            pass
+        else:
+            super(Piano, self).__init__(sound_index)
 
-        pianohat.on_note(self.handle_note)
-        pianohat.on_octave_up(self.handle_octave_up)
-        pianohat.on_octave_down(self.handle_octave_down)
-        pianohat.on_instrument(self.handle_instrument)
+            pianohat.on_note(self.handle_note)
+            pianohat.on_octave_up(self.handle_octave_up)
+            pianohat.on_octave_down(self.handle_octave_down)
+            pianohat.on_instrument(self.handle_instrument)
 
-        pianohat.auto_leds(True)
+            pianohat.auto_leds(True)
 
     def load_sounds(self):
+        set_mixer(MIXER_NORMAL)  # reset mixer to normal mode
+
         super(Piano, self).load_sounds()
 
         self.octaves = len(self.sounds) / 12
