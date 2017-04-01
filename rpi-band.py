@@ -2,12 +2,14 @@
 
 import argparse
 import glob
+import math
 import os
 import pygame
 import re
 import signal
 import subprocess
 import sys
+import time
 
 import drumhat
 import pianohat
@@ -34,13 +36,59 @@ GPIO.setmode(GPIO.BCM)
 # safe shutdown button is pin 14 (GND) and pin 18(IO: 24 in BCM) in BOARD numbering
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# It might be very impossible to run the drums and the 8bit synthi concurrently
-# maybe on another core
-# switching rates, even if very fast, is probably impossible
-# BS, drums will just be 8bit then
-# test switching the bitrate with mixer.quit(), then recreating it
+############## synthi constants
+ATTACK_MS=25
+RELEASE_MS=500
 
-# we need a different way for toggeling sine, square ect.: octave up/down needs to iterate over a list of all possible combinations
+# Feel free to change the volume!
+volume = {'sine':0.8, 'saw':0.4, 'square':0.4}
+
+wavetypes = ['sine','saw','square']
+enabled = {'sine':True, 'saw':False, 'square':False}
+notes = {'sine':[],'saw':[],'square':[]}
+
+
+# The samples are 8bit signed, from -127 to +127
+# so the max amplitude of a sample is 127
+max_sample = 2**(BITRATE - 1) - 1
+
+def wave_sine(freq, time):
+    """Generates a single sine wave sample"""
+    s = math.sin(2*math.pi*freq*time)
+    return int(round(max_sample * s ))
+
+
+def wave_square(freq, time):
+    """Generates a single square wave sample"""
+    return -max_sample if freq*time < 0.5 else max_sample
+
+
+def wave_saw(freq, time):
+    """Generates a single sav wave sample"""
+    s = ((freq*time)*2) - 1
+    return int(round(max_sample * s)) 
+
+# generate samples
+for f in [
+        261.626,
+        277.183,
+        293.665,
+        311.127,
+        329.628,
+        349.228,
+        369.994,
+        391.995,
+        415.305,
+        440.000,
+        466.164,
+        493.883,
+        523.251
+    ]:
+    notes['sine'] += [generate_sample(f, volume=volume['sine'], wavetype=wave_sine)]
+    notes['saw'] += [generate_sample(f, volume=volume['saw'], wavetype=wave_saw)]
+    notes['square'] += [generate_sample(f, volume=volume['square'], wavetype=wave_square)]
+
+############## /synthi constants
 
 
 def parse_arguments(sysargs):
@@ -68,6 +116,27 @@ def set_mixer(mixer_values):
     pygame.mixer.set_num_channels(32)
 
 set_mixer(MIXER_NORMAL)
+
+
+class Container:
+    """ Container is a factory for creating instruments, necessary for 
+    switching to 8-bit piano """
+
+    piano = None
+    drums = None
+
+    def __init__(self, piano_index, drums_index):
+        self.drums = Drums(drums_index)
+        self.create_piano(piano_index)
+
+        signal.pause()
+
+    def create_piano(self, piano_index):
+        if sound_sets[piano_index] == '8bit':
+            # TESTING: set sounds to piano
+            self.piano = Synthesizer(self, 1)
+        else:
+            self.piano = Piano(self, piano_index)
 
 
 class Instrument:
@@ -98,30 +167,6 @@ class Drums(Instrument):
 
     def handle_release(self):
         pass  
-
-# sooooo.... what's better? make 8bit an own class that can't be changed with the instrument button?
-# GOAL: create new instruments everytime the instrument button is pushed
-#           that's the first step,
-#           then make 8bit synthi an instrument
-
-# would a tiny factory suffice?
-
-
-class Container:
-    """ Container is a factory for creating instruments, necessary for 
-    switching to 8-bit piano """
-
-    piano = None
-    drums = None
-
-    def __init__(self, piano_index, drums_index):
-        self.drums = Drums(drums_index)
-        self.create_piano(piano_index)
-
-        signal.pause()
-
-    def create_piano(self, piano_index):
-        self.piano = Piano(self, piano_index)
 
 
 # maybe add a wrapper four outputting played sound  filename?
@@ -171,11 +216,101 @@ class Piano(Instrument):
         if pressed and self.octave > 0:
             self.octave -= 1
 
-class 8BitSynth(Piano):
+# SURPRESS sound generation?
+# octave handling broken
+# a different way for toggeling sine, square ect. is necessary: octave up/down needs to iterate over a list of all possible combinations
+class Synthesizer(Piano):
     mixer_settings = MIXER_8BIT
 
-     def __init__(self, container, sound_index):
-        super(8BitSynth, self).__init__(sound_index)   
+    def __init__(self, container, sound_index):
+        super(Synthesizer, self).__init__(container,  sound_index)   
+
+    def handle_note(self.channel, pressed):
+        """Handles the piano keys
+        Any enabled samples are played, and *all* samples are turned off is a key is released
+        """
+        # OFF for testing
+        #pianohat.set_led(channel, pressed)
+        
+        if pressed:
+            for t in wavetypes:
+                if enabled[t]:
+                    notes[t][channel].play(loops=-1, fade_ms=ATTACK_MS)
+        else:
+            for t in wavetypes:
+                notes[t][channel].fadeout(RELEASE_MS)
+
+
+############## synthi code
+
+# for first experiments, disable this (not necessary, we won't handle_instrument like below anyways)
+def update_leds():
+    """Updates the Instrument and Octave LEDs to show enabled samples"""
+    pianohat.set_led(15, enabled['sine'])
+    pianohat.set_led(14, enabled['saw'])
+    pianohat.set_led(13, enabled['square'])
+
+# IS IT NECESSARY TO HANDLE LED LIGHTING MANUALLY FOR MY CONCEPT???
+
+# this will be handled differently; the first version should just stick with the default config
+def handle_instrument(channel, pressed):
+    """Handles the Instrument, Octave Up/Down keys
+    These toggle Sine, Saw and Square waves on and off so you can combine them
+    """
+    if not pressed:
+        return
+
+    if channel == 15: # Sine
+        enabled['sine'] = not enabled['sine']
+        print("Sine: {}".format("ON" if enabled['sine'] else "OFF"))
+    if channel == 14: # Saw
+        enabled['saw'] = not enabled['saw']
+        print("Saw: {}".format("ON" if enabled['saw'] else "OFF"))
+    if channel == 13: # Square
+        enabled['square'] = not enabled['square']
+        print("Square: {}".format("ON" if enabled['square'] else "OFF"))
+
+    update_leds()
+
+# IMPORTANT
+# called by on_note
+def play_sample(channel, pressed):
+    """Handles the piano keys
+    Any enabled samples are played, and *all* samples are turned off is a key is released
+    """
+    pianohat.set_led(channel, pressed)
+    if pressed:
+        for t in wavetypes:
+            if enabled[t]:
+                notes[t][channel].play(loops=-1, fade_ms=ATTACK_MS)
+    else:
+        for t in wavetypes:
+            notes[t][channel].fadeout(RELEASE_MS)
+
+# IMPORTANT
+def generate_sample(frequency, volume=1.0, wavetype=None):
+    """Generates a sample of a specific frequency and wavetype"""
+    if wavetype is None:
+        wavetype = wave_square
+
+    sample_count = int(round(SAMPLERATE/frequency))
+
+    buf = numpy.zeros((sample_count, 2), dtype = numpy.int8)
+
+    for s in range(sample_count):
+        t = float(s)/SAMPLERATE # Time index
+        buf[s][0] = wavetype(frequency, t)
+        buf[s][1] = buf[s][0] # Copy to stero channel
+
+    sound = pygame.sndarray.make_sound(buf)
+    sound.set_volume(volume) # Set the volume to balance sounds
+
+    return sound
+
+
+
+
+############## /synthi code
 
 
 def turn_off(pin):

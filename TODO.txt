@@ -1,2 +1,4 @@
 * integrate 8bit synthi
-* cleanup might be necessary
+* GPIO.cleanup might be necessary
+* visualize sound generation! 
+    a row of colored, splintered bars
