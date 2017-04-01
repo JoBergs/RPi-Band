@@ -37,8 +37,10 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 ############## synthi constants
-ATTACK_MS=25
-RELEASE_MS=500
+
+BITRATE = 44100
+ATTACK_MS = 25
+RELEASE_MS = 500
 
 # Feel free to change the volume!
 volume = {'sine':0.8, 'saw':0.4, 'square':0.4}
