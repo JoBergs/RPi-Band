@@ -115,15 +115,15 @@ class Container:
     piano = None
     drums = None
 
-    def __init__(self, piano_type, drums_type):
-        self.drums = Drums(sound_sets.index(args.drums))
-        self.create_piano(piano_type)
+    def __init__(self, piano_index, drums_index):
+        self.drums = Drums(drums_index)
+        self.create_piano(piano_index)
 
-    def create_piano(self, piano_type):
+    def create_piano(self, piano_index):
         # This looks stupid. pass index instead? -> yes
         # nono static method is no good
         
-        self.piano = Piano(self, sound_sets.index(args.piano))
+        self.piano = Piano(self, piano_index)
 
         signal.pause()
 
@@ -178,10 +178,10 @@ class Piano(Instrument):
 
         if pressed:
             self.sound_index = (self.sound_index + 1) % len(sound_sets)
-            #self.container.
+            self.container.create_piano(self.sound_index)
             
             # not necessary anymore, rethink
-            self.load_sounds()
+            #self.load_sounds()
 
     def handle_octave_up(self, channel, pressed):
         if pressed and self.octave < int(self.octaves) - 1:
