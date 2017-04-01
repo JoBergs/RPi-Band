@@ -47,7 +47,9 @@ def set_mixer(mixer_values):
     pygame.mixer.init()
     pygame.mixer.set_num_channels(32)
 
-set_mixer(MIXER_NORMAL)
+# TESTESTSET
+# set_mixer(MIXER_NORMAL)
+set_mixer(MIXER_8BIT)
 
 ############## synthi constants
 SAMPLERATE = 44100
@@ -98,6 +100,17 @@ def generate_sample(frequency, volume=1.0, wavetype=None):
         t = float(s)/SAMPLERATE # Time index
         buf[s][0] = wavetype(frequency, t)
         buf[s][1] = buf[s][0] # Copy to stero channel
+
+    # print(buf)
+    # so for some reason this breaks after the first sample set; 
+    # maybe enabled is missing?
+
+    #  REASON COULD BE:
+    #       pygame is initialised differently!
+    #       YES THAT'S THE CAUSE!
+    #       SOLUTION: GENERATE SAMPLES WHEN THE 8bit synthi is initialized!
+    #       NO! the current solution is fine; create samples on startup -> saves time later
+    #           -> YES! samples are only generated once!
 
     sound = pygame.sndarray.make_sound(buf)
     sound.set_volume(volume) # Set the volume to balance sounds
