@@ -185,6 +185,7 @@ class Instrument:
         sounds_path.sort(key=natural_sort_key)
         self.sounds = [pygame.mixer.Sound(f) for f in sounds_path]  
 
+
 class Drums(Instrument):
 
     def __init__(self, sound_index):
@@ -247,9 +248,7 @@ class Piano(Instrument):
         if pressed and self.octave > 0:
             self.octave -= 1
 
-# SURPRESS sound generation?
-# octave handling broken
-# a different way for toggeling sine, square ect. is necessary: octave up/down needs to iterate over a list of all possible combinations
+
 class Synthesizer(Piano):
     mixer_settings = MIXER_8BIT
     wavetype_index = 0
@@ -261,22 +260,10 @@ class Synthesizer(Piano):
         """Handles the piano keys
         Any enabled samples are played, and *all* samples are turned off is a key is released
         """
-        # OFF for testing
-        #pianohat.set_led(channel, pressed)
-
-        print('wave descriptions ', wavetypes)
-        print('wavetype index is ', self.wavetype_index)
-        print('which gives ', LEGAL_WAVES[self.wavetype_index])
-
-        # recheck false, false, true which is sine saw
         
         if pressed:
-
-
-            #for t in wavetypes:
             # 'tis so ugly
             for i in range(3):
-                #for t in LEGAL_WAVES[self.wavetype_index]:
                 if LEGAL_WAVES[self.wavetype_index][i]:
                     notes[wavetypes[i]][channel].play(loops=-1, fade_ms=ATTACK_MS)
         else:
@@ -284,12 +271,10 @@ class Synthesizer(Piano):
                 notes[t][channel].fadeout(RELEASE_MS)
 
     def handle_octave_up(self, channel, pressed):
-        # print(self.wavetype_index)
         if pressed and self.wavetype_index < len(LEGAL_WAVES) - 1:
             self.wavetype_index += 1
 
     def handle_octave_down(self, channel, pressed):
-        # print(self.wavetype_index)
         if pressed and self.wavetype_index > 0:
             self.wavetype_index -= 1
 
