@@ -252,6 +252,7 @@ class Piano(Instrument):
 # a different way for toggeling sine, square ect. is necessary: octave up/down needs to iterate over a list of all possible combinations
 class Synthesizer(Piano):
     mixer_settings = MIXER_8BIT
+    wavetype_index = 0
 
     def __init__(self, container, sound_index):
         super(Synthesizer, self).__init__(container,  sound_index)   
@@ -270,6 +271,16 @@ class Synthesizer(Piano):
         else:
             for t in wavetypes:
                 notes[t][channel].fadeout(RELEASE_MS)
+
+    def handle_octave_up(self, channel, pressed):
+        print(self.wavetype_index)
+        if pressed and self.wavetype_index < len(legal_waves) - 1:
+            self.wavetype_index += 1
+
+    def handle_octave_down(self, channel, pressed):
+        print(self.wavetype_index)
+        if pressed and self.wavetype_index > 0:
+            self.wavetype_index -= 1
 
 
 ############## synthi code
