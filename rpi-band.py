@@ -63,6 +63,8 @@ volume = {'sine':0.8, 'saw':0.4, 'square':0.4}
 
 wavetypes = ['sine','saw','square']
 enabled = {'sine':True, 'saw':False, 'square':False}
+
+
 notes = {'sine':[],'saw':[],'square':[]}
 
 
@@ -100,17 +102,6 @@ def generate_sample(frequency, volume=1.0, wavetype=None):
         t = float(s)/SAMPLERATE # Time index
         buf[s][0] = wavetype(frequency, t)
         buf[s][1] = buf[s][0] # Copy to stero channel
-
-    # print(buf)
-    # so for some reason this breaks after the first sample set; 
-    # maybe enabled is missing?
-
-    #  REASON COULD BE:
-    #       pygame is initialised differently!
-    #       YES THAT'S THE CAUSE!
-    #       SOLUTION: GENERATE SAMPLES WHEN THE 8bit synthi is initialized!
-    #       NO! the current solution is fine; create samples on startup -> saves time later
-    #           -> YES! samples are only generated once!
 
     sound = pygame.sndarray.make_sound(buf)
     sound.set_volume(volume) # Set the volume to balance sounds
