@@ -65,10 +65,10 @@ wavetypes = ['sine','saw','square']
 enabled = {'sine':True, 'saw':False, 'square':False}
 
 # build a list of legal wave type combinations
-legal_waves = [[x, y, z] for x in [True, False] for y in [True, False] for z in [True, False]]
-legal_waves.remove([False, False, False])  # no waves gives no sound
-legal_waves.remove([False, True, False])  # only saw gives no sound (bug?)
-#print(legal_waves)
+LEGAL_WAVES = [[x, y, z] for x in [True, False] for y in [True, False] for z in [True, False]]
+LEGAL_WAVES.remove([False, False, False])  # no waves gives no sound
+LEGAL_WAVES.remove([False, True, False])  # only saw gives no sound (bug?)
+#print(LEGAL_WAVES)
 
 notes = {'sine':[],'saw':[],'square':[]}
 
@@ -265,72 +265,27 @@ class Synthesizer(Piano):
         #pianohat.set_led(channel, pressed)
         
         if pressed:
-            for t in wavetypes:
-                if enabled[t]:
-                    notes[t][channel].play(loops=-1, fade_ms=ATTACK_MS)
+
+
+            #for t in wavetypes:
+            # 'tis so ugly
+            for i in range(3):
+                #for t in LEGAL_WAVES[self.wavetype_index]:
+                if LEGAL_WAVES[self.wavetype_index][i]:
+                    notes[wavetypes[i]][channel].play(loops=-1, fade_ms=ATTACK_MS)
         else:
             for t in wavetypes:
                 notes[t][channel].fadeout(RELEASE_MS)
 
     def handle_octave_up(self, channel, pressed):
-        print(self.wavetype_index)
-        if pressed and self.wavetype_index < len(legal_waves) - 1:
+        # print(self.wavetype_index)
+        if pressed and self.wavetype_index < len(LEGAL_WAVES) - 1:
             self.wavetype_index += 1
 
     def handle_octave_down(self, channel, pressed):
-        print(self.wavetype_index)
+        # print(self.wavetype_index)
         if pressed and self.wavetype_index > 0:
             self.wavetype_index -= 1
-
-
-############## synthi code
-
-# for first experiments, disable this (not necessary, we won't handle_instrument like below anyways)
-def update_leds():
-    """Updates the Instrument and Octave LEDs to show enabled samples"""
-    pianohat.set_led(15, enabled['sine'])
-    pianohat.set_led(14, enabled['saw'])
-    pianohat.set_led(13, enabled['square'])
-
-# IS IT NECESSARY TO HANDLE LED LIGHTING MANUALLY FOR MY CONCEPT???
-
-# this will be handled differently; the first version should just stick with the default config
-def handle_instrument(channel, pressed):
-    """Handles the Instrument, Octave Up/Down keys
-    These toggle Sine, Saw and Square waves on and off so you can combine them
-    """
-    if not pressed:
-        return
-
-    if channel == 15: # Sine
-        enabled['sine'] = not enabled['sine']
-        print("Sine: {}".format("ON" if enabled['sine'] else "OFF"))
-    if channel == 14: # Saw
-        enabled['saw'] = not enabled['saw']
-        print("Saw: {}".format("ON" if enabled['saw'] else "OFF"))
-    if channel == 13: # Square
-        enabled['square'] = not enabled['square']
-        print("Square: {}".format("ON" if enabled['square'] else "OFF"))
-
-    update_leds()
-
-# IMPORTANT
-# called by on_note
-def play_sample(channel, pressed):
-    """Handles the piano keys
-    Any enabled samples are played, and *all* samples are turned off is a key is released
-    """
-    pianohat.set_led(channel, pressed)
-    if pressed:
-        for t in wavetypes:
-            if enabled[t]:
-                notes[t][channel].play(loops=-1, fade_ms=ATTACK_MS)
-    else:
-        for t in wavetypes:
-            notes[t][channel].fadeout(RELEASE_MS)
-
-
-############## /synthi code
 
 
 def turn_off(pin):
