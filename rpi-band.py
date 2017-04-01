@@ -134,7 +134,7 @@ class Container:
         
         # NECESSARY?
         self.piano = None
-        
+        print('bla1 ', piano_index)
         self.piano = Piano(self, piano_index)
 
         signal.pause()
@@ -164,12 +164,12 @@ class Piano(Instrument):
         # else:
 
         # it's printed only once because it's called only once!
-        print('bla1 ', self.sound_index)
+        # print('bla1 ', self.sound_index)
 
         super(Piano, self).__init__(sound_index)
 
         self.container = container
-        print('bla2 ', self.sound_index)
+        # print('bla2 ', self.sound_index)
 
         pianohat.on_note(self.handle_note)
         pianohat.on_octave_up(self.handle_octave_up)
