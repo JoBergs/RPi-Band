@@ -26,7 +26,9 @@ SOUND_BASEDIR = os.path.join(os.path.dirname(__file__), "sounds/")
 
 # list of all available soundsets
 sound_sets = [os.path.basename(tmp) for tmp in glob.glob(os.path.join(SOUND_BASEDIR, "*"))]
-sound_sets.append("8bit")
+
+# OFF for refactoring
+#sound_sets.append("8bit")
 
 GPIO.setmode(GPIO.BCM)
 
@@ -108,6 +110,8 @@ class Drums(Instrument):
 
 # rethink piano index management
 
+# now, drums and piano are inverted
+
 class Container:
     """ Container is a factory for creating instruments, necessary for 
     switching to 8-bit piano """
@@ -138,20 +142,21 @@ class Piano(Instrument):
     def __init__(self, container, sound_index):
         self.container = container
 
-        if sound_sets[sound_index] == '8bit':
-            print("\n8bit!!!\n")
-            set_mixer(MIXER_8BIT)
-            pianohat.auto_leds(False)
+        # if sound_sets[sound_index] == '8bit':
+        #     print("\n8bit!!!\n")
+        #     set_mixer(MIXER_8BIT)
+        #     pianohat.auto_leds(False)
 
-        else:
-            super(Piano, self).__init__(sound_index)
+        # else:
 
-            pianohat.on_note(self.handle_note)
-            pianohat.on_octave_up(self.handle_octave_up)
-            pianohat.on_octave_down(self.handle_octave_down)
-            pianohat.on_instrument(self.handle_instrument)
+        super(Piano, self).__init__(sound_index)
 
-            pianohat.auto_leds(True)
+        pianohat.on_note(self.handle_note)
+        pianohat.on_octave_up(self.handle_octave_up)
+        pianohat.on_octave_down(self.handle_octave_down)
+        pianohat.on_instrument(self.handle_instrument)
+
+        pianohat.auto_leds(True)
 
     def load_sounds(self):
         set_mixer(MIXER_NORMAL)  # reset mixer to normal mode
