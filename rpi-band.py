@@ -112,6 +112,8 @@ class Drums(Instrument):
 
 # now, drums and piano are inverted
 
+# ok so this is stupid: Container and the instruments both receive an sound_index
+
 class Container:
     """ Container is a factory for creating instruments, necessary for 
     switching to 8-bit piano """
@@ -126,6 +128,12 @@ class Container:
     def create_piano(self, piano_index):
         # This looks stupid. pass index instead? -> yes
         # nono static method is no good
+        # could be a garbage collection issue
+
+        # if self.piano:
+        
+        # NECESSARY?
+        self.piano = None
         
         self.piano = Piano(self, piano_index)
 
@@ -140,7 +148,13 @@ class Piano(Instrument):
     container = None 
 
     def __init__(self, container, sound_index):
-        self.container = container
+        # the line below happens in super
+        #self.sound_index = sound_index
+        
+
+        # ok something is messed up with multiple definitions of sound_index
+
+        
 
         # if sound_sets[sound_index] == '8bit':
         #     print("\n8bit!!!\n")
@@ -149,7 +163,13 @@ class Piano(Instrument):
 
         # else:
 
+        # it's printed only once because it's called only once!
+        print('bla1 ', self.sound_index)
+
         super(Piano, self).__init__(sound_index)
+
+        self.container = container
+        print('bla2 ', self.sound_index)
 
         pianohat.on_note(self.handle_note)
         pianohat.on_octave_up(self.handle_octave_up)
@@ -183,10 +203,10 @@ class Piano(Instrument):
 
         if pressed:
             self.sound_index = (self.sound_index + 1) % len(sound_sets)
-            self.container.create_piano(self.sound_index)
+            #self.container.create_piano(self.sound_index)
             
             # not necessary anymore, rethink
-            #self.load_sounds()
+            self.load_sounds()
 
     def handle_octave_up(self, channel, pressed):
         if pressed and self.octave < int(self.octaves) - 1:
