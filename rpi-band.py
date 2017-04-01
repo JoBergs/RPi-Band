@@ -225,7 +225,7 @@ class Synthesizer(Piano):
     def __init__(self, container, sound_index):
         super(Synthesizer, self).__init__(container,  sound_index)   
 
-    def handle_note(self.channel, pressed):
+    def handle_note(self, channel, pressed):
         """Handles the piano keys
         Any enabled samples are played, and *all* samples are turned off is a key is released
         """
