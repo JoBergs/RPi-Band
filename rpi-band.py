@@ -106,6 +106,8 @@ class Drums(Instrument):
 # would a tiny factory suffice?
 #   
 
+# rethink piano index management
+
 class Container:
     """ Container is a factory for creating instruments, necessary for 
     switching to 8-bit piano """
@@ -114,20 +116,28 @@ class Container:
     drums = None
 
     def __init__(self, piano_type, drums_type):
-        self.create_instruments(piano_type, drums_type)
+        self.drums = Drums(sound_sets.index(args.drums))
+        self.create_piano(piano_type)
 
-    def create_instruments(self, piano_type, drums_type):
-        drums = Drums(sound_sets.index(args.drums))
-        piano = Piano(sound_sets.index(args.piano))
+    def create_piano(self, piano_type):
+        # This looks stupid. pass index instead? -> yes
+        # nono static method is no good
+        
+        self.piano = Piano(self, sound_sets.index(args.piano))
 
         signal.pause()
+
+# for now, i'll simply pass a reference to the container
 
 # maybe add a wrapper four outputting played sound  filename?
 class Piano(Instrument):
     octave = 0
-    octaves = 0  
+    octaves = 0 
+    container = None 
 
-    def __init__(self, sound_index):
+    def __init__(self, container, sound_index):
+        self.container = container
+
         if sound_sets[sound_index] == '8bit':
             print("\n8bit!!!\n")
             set_mixer(MIXER_8BIT)
@@ -159,8 +169,18 @@ class Piano(Instrument):
             self.sounds[channel].play(loops=0)
 
     def handle_instrument(self, channel, pressed):
+        # this needs to call the parents function create_instruments
+
+        # would be using a static method appropriate?
+
+        # import ipdb
+        # ipdb.set_trace()
+
         if pressed:
             self.sound_index = (self.sound_index + 1) % len(sound_sets)
+            #self.container.
+            
+            # not necessary anymore, rethink
             self.load_sounds()
 
     def handle_octave_up(self, channel, pressed):
