@@ -133,7 +133,7 @@ class Container:
         # if self.piano:
         
         # NECESSARY?
-        self.piano = None
+        # self.piano = None
         print('bla1 ', piano_index)
         self.piano = Piano(self, piano_index)
 
@@ -203,6 +203,8 @@ class Piano(Instrument):
 
         if pressed:
             self.sound_index = (self.sound_index + 1) % len(sound_sets)
+            
+            # redefining piano simply doesn't work...
             #self.container.create_piano(self.sound_index)
             
             # not necessary anymore, rethink
