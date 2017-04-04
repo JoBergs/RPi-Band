@@ -35,3 +35,5 @@ and add the line
 # Parent GitHub repositories and original READMEs 
 Piano HAT: https://github.com/pimoroni/Piano-HAT  
 Drum HAT: https://github.com/pimoroni/Drum-HAT
+
+# Have fun!
