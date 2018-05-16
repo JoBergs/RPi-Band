@@ -1,4 +1,4 @@
-* GPIO.cleanup might be necessary
+* GPIO.cleanup might be necessary?
 * visualize sound generation! 
     a row of colored, splintered bars
 * modularize: file instruments.py
