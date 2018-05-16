@@ -20,12 +20,42 @@ PHOTO!
     sudo apt-get install python3-drumhat
     git clone https://github.com/JoBergs/RPi-Band
 
+# pHAT DAQ installation
+Ĝives better audio; if the default PWM out shall be used, just don't perform these steps
+
+    sudo nano /etc/asound.conf
+
+add
+
+    pcm.!default  {
+     type hw card 0
+    }
+    ctl.!default {
+     type hw card 0
+    }
+
+    sudo nano /boot/config.txt
+
+add
+
+    dtoverlay=hifiberry-dac
+
+replace
+
+    dtparam=audio=on
+
+with
+
+    #dtparam=audio=on
+
+# Autostart
+
+GIVE HELP FOR AUTOSTARTING (.bashrc should be sufficient)
 
 # Usage
 
     cd ~/RPi-band
     python3 rpi-band.py
 
-# Autostart
 
-GIVE HELP FOR AUTOSTARTING (.bashrc should be sufficient)
+
